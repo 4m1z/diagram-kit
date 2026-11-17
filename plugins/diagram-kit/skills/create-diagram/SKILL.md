@@ -23,7 +23,7 @@ Turn understanding into a picture that is correct, minimal and easy to read. You
 
 ## Steps
 
-1. **Read the environment**: where the result goes and what style the host already has ([environment](references/environment.md)).
+1. **Settle the destination and the style** ([environment](references/environment.md)). If the user has not said where the diagram goes and you can ask, ask once, with options built from what this environment offers: inside their app (React component, or `layout.json` for their own renderer), a cloud artifact (claude.ai, when the Artifact tool exists), a standalone HTML page, or an image for docs. Ask together with any other questions. If nobody can answer (headless or `exec` runs), use the default, a standalone page in `docs/diagrams/<slug>/`, and say where it went. Then check what style the host already has.
 2. **Know the subject.** Code: start at entry points and trace the real path; cite `file:line`. A document: extract its parts, flows and claims. Deep path: write the brief, show it, wait for approval, set `status: approved`.
 3. **Choose the kind and the views** ([kinds](references/kinds.md)). One question per view, about 12 to 15 parts at most. Big subjects become an overview plus focused views.
 4. **Write the spec** ([spec](references/spec.md)): meaning only. Tiers in reading order, groups, parts declared in flow order, the main flow, labels of one to three words. Technical detail goes in `sub` (one short line) and in `about`, `details` and `facts` (shown on click).
@@ -38,3 +38,4 @@ Turn understanding into a picture that is correct, minimal and easy to read. You
 - Positions come from the engine. Never hand-edit generated files; change the spec or the tokens and rebuild.
 - Adopt the host's look when it has one ([design](references/design.md)); otherwise use the default, which is sleek and neutral.
 - Keep specs next to their output so the diagram can be rebuilt and tuned later.
+- Always end by saying exactly where the result is: the file path, the component to import, or the artifact link.

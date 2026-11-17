@@ -2,9 +2,25 @@
 
 Decide this first; it changes the output, not the spec.
 
+## Choosing the destination
+
+- The user named it ("put it in the app", "make an artifact", "a PNG for the README"): do that.
+- Not named, and you can ask: ask once, together with any other questions, offering only what this environment supports. Recommend the option that fits the context first:
+
+| Option | Offer it when | What you produce |
+|---|---|---|
+| In this app | The workspace is an app the user develops (React: `--react`; anything else: `layout.json`) | A component in the app's source tree, or positioned data the app renders itself |
+| Cloud artifact | The host has a publishing tool (Claude Code's Artifact tool) | The HTML page published as a private artifact, and its link |
+| Standalone page | Always | `<name>.html` in a folder the user picks or the repo's diagram folder |
+| Image for docs | The diagram goes into Markdown, a PR, slides or chat | `<name>.png` (and `--dark`), with the HTML linked for interaction |
+
+- Cannot ask (headless, scheduled or `exec` runs, no question tool, no answer): use the standalone page in the default folder below and report the path.
+- Layout happens when you build. An app that needs live layout for data that changes at runtime should render `layout.json` for fixed diagrams only, or call the scripts again when the spec changes.
+
 ## Where files go
 
 - Inside a repository: follow its convention (`docs/diagrams/`, `design/`, ...). With none, use `docs/diagrams/<slug>/` and keep the spec, brief and outputs together.
+- In this app: the component or data goes where the app keeps similar code (for example `src/components/diagrams/<name>/`); the spec and brief still live in the diagram folder so the diagram can be rebuilt.
 - Outside a repository: next to the document being explained, or a folder the user names.
 - Add `*.png` previews to version control only if the project keeps images; the spec rebuilds everything.
 
