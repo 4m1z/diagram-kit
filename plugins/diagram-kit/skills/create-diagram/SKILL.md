@@ -5,15 +5,21 @@ description: Make clear, well-positioned, interactive diagrams (system design an
 
 # Create diagram
 
-Turn understanding into a picture that is correct, minimal and easy to read. You decide the meaning; the scripts decide the geometry. Never place coordinates yourself.
+Agents are poor at placing boxes. Use this skill's scripts for geometry: you decide the meaning, ELK.js decides the positions, the checks tell you what is wrong. Never place coordinates yourself.
 
 `<skill>` below is the folder holding this file.
 
-## Setup, once per install
+## Setup, once
 
 - Node 22.12 or newer.
-- `node <skill>/scripts/diagram.mjs setup` once: installs the pinned dependencies into `~/.cache/diagram-kit/` (needs network). The install is shared by Claude Code, Codex and every copy of the skill, and survives plugin refreshes; a new release with new dependencies asks for setup again. In Codex, ask to run it with escalated permissions.
+- `node <skill>/scripts/diagram.mjs setup` installs the pinned dependencies into `~/.cache/diagram-kit/` (needs network). One install serves Claude Code, Codex and every copy of the skill, and survives plugin refreshes. In Codex, ask to run it with escalated permissions.
 - CLI: `node <skill>/scripts/diagram.mjs` (`help` lists commands). It prints the setup command when dependencies are missing.
+
+## Adapt, never impose
+
+- The user's environment wins: their medium, their style, their language and tone. Our look is only a fallback for a standalone page or artifact when there is no host style.
+- Follow what the user asks about wording and depth: another language, a different tone, fewer details or none.
+- Details (`about`, `details`, facts and sources, shown on click) are included by default only in standalone pages and artifacts. Elsewhere add them where the medium has a natural place for them.
 
 ## Pick a path
 
@@ -23,19 +29,21 @@ Turn understanding into a picture that is correct, minimal and easy to read. You
 
 ## Steps
 
-1. **Settle the destination and the style** ([environment](references/environment.md)). If the user has not said where the diagram goes and you can ask, ask once, with options built from what this environment offers: inside their app (React component, or `layout.json` for their own renderer), a cloud artifact (claude.ai, when the Artifact tool exists), a standalone HTML page, or an image for docs. Ask together with any other questions. If nobody can answer (headless or `exec` runs), use the default, a standalone page in `docs/diagrams/<slug>/`, and say where it went. Then check what style the host already has.
+1. **Settle the destination** ([environment](references/environment.md)). If the user has not said where the diagram goes and you can ask, ask once, with options built from what this environment offers: their own medium (their app, canvas or drawing code, docs tool), a cloud artifact (when the Artifact tool exists), a standalone HTML page, or an image for docs. Ask together with any other questions. If nobody can answer (headless or `exec` runs), make a standalone page in `docs/diagrams/<slug>/` and say where it went.
 2. **Know the subject.** Code: start at entry points and trace the real path; cite `file:line`. A document: extract its parts, flows and claims. Deep path: write the brief, show it, wait for approval, set `status: approved`.
 3. **Choose the kind and the views** ([kinds](references/kinds.md)). One question per view, about 12 to 15 parts at most. Big subjects become an overview plus focused views.
-4. **Write the spec** ([spec](references/spec.md)): meaning only. Tiers in reading order, groups, parts declared in flow order, the main flow, labels of one to three words. Technical detail goes in `sub` (one short line) and in `about`, `details` and `facts` (shown on click).
+4. **Write the spec** ([spec](references/spec.md)): meaning only. Tiers in reading order, groups, parts declared in flow order, the main flow, labels of one to three words.
 5. **Build**: `node <skill>/scripts/diagram.mjs build <spec> --out <dir>` writes `<name>.layout.json`, `<name>.html` and `<name>.png`, and prints the check report.
 6. **Check and look.** Fix every ✗; weigh every !. Then look at the PNG (Read tool in Claude Code, `view_image` in Codex) against the [checklist](references/checklist.md). Fix through the spec: tiers, order, groups, direction, labels, or splitting ([layout](references/layout.md)). At most two rounds, then report what is left.
-7. **Deliver** in the form the environment wants: the HTML page, a claude.ai artifact, or a React component (`--react`). On the deep path the final build uses `--strict`, which fails while the brief is unapproved; a draft page shows a Draft label. End with one or two lines and the link or path. Do not narrate the diagram.
+7. **Deliver in the destination's medium.**
+   - Standalone page or artifact: the built HTML. On the deep path the final build uses `--strict`, which fails while the brief is unapproved.
+   - The user's own medium: treat the kit's result as the plan. Reproduce its positions and routes (`layout.json`) with their components, styles and conventions; do not ship our viewer or theme into their environment.
+   - Fit first: if it fits what is already there (components, libraries, styles, folders), integrate it. If it would need new dependencies, new components, style or structural changes, propose that and ask before changing anything.
+   - End with one or two lines saying exactly where the result is: the file path, the component, or the artifact link. Do not narrate the diagram.
 
 ## Rules
 
-- Minimal: no extra text, legends only when an encoding repeats, no decoration. The picture shows structure and flow; explanations live in the click panel.
+- Minimal canvas: short labels, no legends unless an encoding repeats, no decoration. Explanations go in the details, not on the picture.
 - Correct: every part, wire and label traces to code, a document or the user. Never invent components, protocols or numbers. Mark assumptions as assumptions.
-- Positions come from the engine. Never hand-edit generated files; change the spec or the tokens and rebuild.
-- Adopt the host's look when it has one ([design](references/design.md)); otherwise use the default, which is sleek and neutral.
-- Keep specs next to their output so the diagram can be rebuilt and tuned later.
-- Always end by saying exactly where the result is: the file path, the component to import, or the artifact link.
+- Positions come from the engine. Never hand-edit generated files; change the spec and rebuild.
+- Keep the spec (and brief) next to the output so the diagram can be rebuilt later.

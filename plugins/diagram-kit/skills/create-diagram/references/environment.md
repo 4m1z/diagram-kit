@@ -9,7 +9,7 @@ Decide this first; it changes the output, not the spec.
 
 | Option | Offer it when | What you produce |
 |---|---|---|
-| In this app | The workspace is an app the user develops (React: `--react`; anything else: `layout.json`) | A component in the app's source tree, or positioned data the app renders itself |
+| Their own medium | The workspace has its own way to show diagrams: an app, a canvas or drawing library, a docs or design tool | The same diagram rebuilt in that medium from `layout.json`, with their components and style (see below) |
 | Cloud artifact | The host has a publishing tool (Claude Code's Artifact tool) | The HTML page published as a private artifact, and its link |
 | Standalone page | Always | `<name>.html` in a folder the user picks or the repo's diagram folder |
 | Image for docs | The diagram goes into Markdown, a PR, slides or chat | `<name>.png` (and `--dark`), with the HTML linked for interaction |
@@ -17,10 +17,18 @@ Decide this first; it changes the output, not the spec.
 - Cannot ask (headless, scheduled or `exec` runs, no question tool, no answer): use the standalone page in the default folder below and report the path.
 - Layout happens when you build. An app that needs live layout for data that changes at runtime should render `layout.json` for fixed diagrams only, or call the scripts again when the spec changes.
 
+## Working in the user's medium
+
+1. Plan with the kit first: spec, build, check, look, exactly as for a standalone page. This is where the positions and routes get good.
+2. Read their environment: how they already draw (components, canvas or SVG code, a diagram library, a docs format), their styles and tokens, their folder conventions.
+3. Reproduce the result there: take every position, size and wire route from `layout.json` and draw it with their primitives and style. Keep the spec next to it so the diagram can be rebuilt.
+4. Fit check: if it fits what exists, integrate it. If it would need a new dependency, a new component pattern, a style change or a structural change, describe the change, recommend one option and ask before touching anything. Never restyle or restructure their environment to suit the diagram.
+5. Language, tone and detail follow the user and the medium: details go only where the medium has a natural place for them.
+
 ## Where files go
 
 - Inside a repository: follow its convention (`docs/diagrams/`, `design/`, ...). With none, use `docs/diagrams/<slug>/` and keep the spec, brief and outputs together.
-- In this app: the component or data goes where the app keeps similar code (for example `src/components/diagrams/<name>/`); the spec and brief still live in the diagram folder so the diagram can be rebuilt.
+- In the user's medium: the result goes where they keep similar things (for example next to their other diagrams or components); the spec and brief still live in the diagram folder so the diagram can be rebuilt.
 - Outside a repository: next to the document being explained, or a folder the user names.
 - Add `*.png` previews to version control only if the project keeps images; the spec rebuilds everything.
 
@@ -30,9 +38,9 @@ Decide this first; it changes the output, not the spec.
 |---|---|
 | Default | `<name>.html`: one self-contained page (fonts, data and viewer inlined, no network). Open it or give its path. |
 | Claude Code with the Artifact tool | Publish `<name>.html` as an artifact. It already follows the artifact page contract: tokens on `:root`, dark mode by media query and `data-theme`, an explicit body background, no external requests. |
-| A React project | `build <spec> --react src/diagrams/<name>` writes `Diagram.tsx` (a client component), `diagram-viewer.js`, `diagram.css` (tokens scoped to `.dk-root`, Geist via `fonts/`), `<name>.layout.json` and a usage example. Import the JSON and render `<Diagram model={model} />`. Next.js Pages Router: import `diagram.css` from `pages/_app` instead. |
+| A React app with nothing of its own for diagrams | `build <spec> --react src/diagrams/<name>` writes `Diagram.tsx` (a client component), `diagram-viewer.js`, `diagram.css` (tokens scoped to `.dk-root`, Geist via `fonts/`), `<name>.layout.json` and a usage example. Import the JSON and render `<Diagram model={model} />`. Next.js Pages Router: import `diagram.css` from `pages/_app` instead. |
 | Markdown, slides, chat, a PR | `<name>.png` (light) and `--dark` for `<name>.dark.png`. Link the HTML for the interactive version. |
-| Another renderer | `<name>.layout.json` is the contract: every node, group and wire with its final coordinates. Draw it any way you like. |
+| The user's own medium | `<name>.layout.json` is the contract: every node, group and wire with its final coordinates and routes. Redraw it with their primitives (see Working in the user's medium). |
 
 ## The interactive page
 
