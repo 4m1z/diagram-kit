@@ -10,5 +10,7 @@ diagram-kit is MIT licensed. It bundles or depends on:
 | @resvg/resvg-js 2.6.2 | npm dependency | MPL-2.0 |
 | yaml 2.9.1 | npm dependency | ISC |
 | opentype.js 2.0.0 | npm dependency | MIT |
+| three.js r187 (npm `three` 0.187.0) | `docs/3d/vendor/` (the 3D demo on the site only) | MIT, `docs/3d/vendor/three-LICENSE.txt` |
+| Geist fonts, copied for the 3D demo | `docs/3d/fonts/` | SIL Open Font License 1.1, `docs/3d/fonts/geist-OFL.txt` |
 
 `assets/metrics.json` holds glyph advance widths measured from the Geist fonts above.
