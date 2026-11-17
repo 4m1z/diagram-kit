@@ -7,16 +7,16 @@ Agents are bad at placing boxes!:D diagram-kit gives Claude Code and Codex a lay
   <img alt="How diagram-kit works: you ask, your agent writes a spec, ELK.js lays it out, the agent checks a preview, the diagram lands in your medium" src="docs/index.png">
 </picture></a>
 
-## install
+## Install & use
 
-claude code
+Claude Code
 
 ```
 /plugin marketplace add Alireza29675/diagram-kit
 /plugin install diagram-kit@diagram-kit
 ```
 
-codex
+Codex
 
 ```
 codex plugin marketplace add Alireza29675/diagram-kit
@@ -25,4 +25,4 @@ codex plugin add diagram-kit@diagram-kit
 
 then ask your agent for a diagram.
 
-mit · [notice](NOTICE.md)
+MIT · [Notice](NOTICE.md)
