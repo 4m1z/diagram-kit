@@ -123,12 +123,16 @@ export function checkModel(model, { phoneWidth = 390, maxNodes = 16, strict = fa
 
   // Backwards flow
   if (real && model.direction) {
-    const axis = model.direction === 'right' || model.direction === 'left' ? 0 : 1;
-    const sign = model.direction === 'right' || model.direction === 'down' ? 1 : -1;
+    // A wire inside a group with its own direction follows that group's direction.
+    const groupDir = new Map((model.groups ?? []).filter((g) => g.direction).map((g) => [g.id, g.direction]));
     const back = model.edges.filter((e) => {
       const a = byId.get(e.from);
       const b = byId.get(e.to);
-      return a && b && !e.back && e.kind !== 'return' && (center(b)[axis] - center(a)[axis]) * sign < -4;
+      if (!a || !b) return false;
+      const dir = (a.group && a.group === b.group && groupDir.get(a.group)) || model.direction;
+      const axis = dir === 'right' || dir === 'left' ? 0 : 1;
+      const sign = dir === 'right' || dir === 'down' ? 1 : -1;
+      return !e.back && e.kind !== 'return' && (center(b)[axis] - center(a)[axis]) * sign < -4;
     });
     const mainBack = back.filter((e) => model.flows?.some((f) => f.primary && f.steps.some((s) => s.edge === e.id)));
     if (mainBack.length)

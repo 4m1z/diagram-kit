@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve, extname } from 'node:path';
 import { dep } from './deps.mjs';
 import { TONES } from '../../assets/viewer/theme.mjs';
-import { EDGE_KINDS } from '../../assets/viewer/render.mjs';
+import { EDGE_KINDS, safeLink } from '../../assets/viewer/render.mjs';
 
 const YAML = dep('yaml');
 
@@ -109,7 +109,7 @@ function asList(value, what) {
 // Fields the engine reads. Anything else is almost always a typo, or a YAML flow mapping split by
 // an unquoted comma ({ sub: a, b } makes a key "b"), so it is reported instead of silently dropped.
 const KNOWN = {
-  element: ['id', 'label', 'sub', 'icon', 'group', 'tier', 'shape', 'tone', 'about', 'details', 'facts', 'sources', 'link', 'fields', 'layout', 'parent', 'children'],
+  element: ['id', 'label', 'sub', 'icon', 'group', 'tier', 'shape', 'tone', 'about', 'details', 'facts', 'sources', 'link', 'fields', 'layout', 'parent', 'children', 'direction'],
   edge: ['id', 'from', 'to', 'label', 'kind', 'about', 'details', 'facts', 'sources', 'link', 'main', 'back'],
 };
 function unknownKeys(o, known, what, id, warnings) {
@@ -147,6 +147,17 @@ function normalizeGraph(raw, base, kind) {
   for (const g of groups) {
     if (g.parent && !groupIds.has(g.parent)) throw new SpecError(`Group "${g.id}" has unknown parent "${g.parent}".`);
     if (g.tier && !tiers.includes(String(g.tier))) throw new SpecError(`Group "${g.id}" uses tier "${g.tier}", which is not in tiers: [${tiers.join(', ')}].`);
+    if (g.direction != null && !DIRECTIONS.includes(g.direction)) throw new SpecError(`Group "${g.id}" direction must be one of ${DIRECTIONS.join(', ')}.`);
+  }
+  // A group with its own direction, or with an icon (drawn as a part), is laid out as one block, so
+  // it holds parts, not groups.
+  for (const g of groups) {
+    const p = g.parent && groupById.get(g.parent);
+    if (p?.direction && p.direction !== direction) throw new SpecError(`Group "${g.id}" sits in "${p.id}", which has its own direction; such a group holds parts only.`);
+    if (p?.icon) throw new SpecError(`Group "${g.id}" sits in "${p.id}", which has an icon and is drawn as a part; such a group holds parts only.`);
+  }
+  for (const x of [...groups, ...nodes]) {
+    if (x.link != null && !safeLink(x.link)) throw new SpecError(`"${x.id}" link must be a plain http(s) address, got "${String(x.link).slice(0, 80)}".`);
   }
   for (const n of nodes) {
     if (n.group && !groupIds.has(n.group)) throw new SpecError(`Node "${n.id}" is in unknown group "${n.group}".`);
@@ -165,6 +176,8 @@ function normalizeGraph(raw, base, kind) {
     const edge = parseEdge(e);
     for (const end of ['from', 'to']) {
       const [nodeId, field] = String(edge[end]).split('.');
+      // A wire may also point at a whole group: it ends on the group's border.
+      if (groupIds.has(nodeId) && !field) { edge[end] = nodeId; continue; }
       if (!nodeIds.has(nodeId)) throw new SpecError(`Edge ${i + 1} (${edge.from} -> ${edge.to}) points at unknown node "${nodeId}".`);
       if (field) {
         const node = nodes.find((n) => n.id === nodeId);
@@ -173,6 +186,9 @@ function normalizeGraph(raw, base, kind) {
       }
       edge[end] = nodeId;
     }
+    const parentOf = (id) => ids.get(id)?.group ?? ids.get(id)?.parent;
+    const within = (id, gid) => { for (let p = parentOf(id); p; p = parentOf(p)) if (p === gid) return true; return false; };
+    if (within(edge.from, edge.to) || within(edge.to, edge.from)) throw new SpecError(`Edge ${i + 1} (${edge.from} -> ${edge.to}) joins a part to a group it sits in; point it at another part.`);
     const key = `${edge.from}->${edge.to}`;
     const count = (seen.get(key) ?? 0) + 1;
     seen.set(key, count);

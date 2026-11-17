@@ -4,6 +4,7 @@ import { dep } from './deps.mjs';
 import { fileURLToPath } from 'node:url';
 import { measure, wrap } from './metrics.mjs';
 import { sizes as S } from '../../assets/viewer/theme.mjs';
+import { LINK_ICON } from '../../assets/viewer/render.mjs';
 
 const ASSETS = fileURLToPath(new URL('../../assets/', import.meta.url));
 const YAML = dep('yaml');
@@ -18,7 +19,8 @@ export const FONT = {
 const up4 = (v) => Math.ceil(v / 4) * 4;
 const widest = (lines, font) => Math.max(0, ...lines.map((l) => measure(l, font)));
 
-export function sizeNode(n) {
+// `textW` is the widest a label line may run before it wraps; `minW` the narrowest a box may be.
+export function sizeNode(n, { textW = S.maxLabelW, minW = S.minNodeW } = {}) {
   const shape = n.shape ?? 'box';
   if (shape === 'start' || shape === 'end') return { w: 18, h: 18, lines: [], subLines: [] };
   if (shape === 'diamond') {
@@ -39,12 +41,14 @@ export function sizeNode(n) {
     const rows = (n.fields ?? []).map((f) => 22 + measure(f.name, FONT.sub) + (f.type ? 24 + measure(f.type, FONT.sub) : 0));
     return { w: up4(Math.max(150, head, ...rows) + 24), h: S.tableHeader + Math.max(1, n.fields?.length ?? 0) * S.tableRow, lines: [n.label], subLines: [] };
   }
-  const lines = wrap(n.label, FONT.label, S.maxLabelW, 2);
-  const subLines = n.sub ? wrap(n.sub, FONT.sub, S.maxLabelW + 24, 2) : [];
-  const textW = Math.max(widest(lines, FONT.label), widest(subLines, FONT.sub));
+  const lines = wrap(n.label, FONT.label, textW, 2);
+  const subLines = n.sub ? wrap(n.sub, FONT.sub, textW + 24, 2) : [];
+  const labelW = Math.max(widest(lines, FONT.label), widest(subLines, FONT.sub));
   const iconW = n.icon ? S.icon + S.iconGap : 0;
   const pad = shape === 'pill' ? S.padX + 6 : S.padX;
-  const w = up4(Math.max(S.minNodeW, pad * 2 + iconW + textW + 2));
+  // A link adds a small arrow in the top-right corner; keep the label clear of it.
+  const linkW = n.link ? S.linkIcon + S.linkInset : 0;
+  const w = up4(Math.max(minW, pad * 2 + iconW + labelW + 2 + linkW));
   const textH = lines.length * S.lineHeight + (subLines.length ? subLines.length * S.subLineHeight + 2 : 0);
   const h = up4(Math.max(shape === 'pill' && !subLines.length ? 36 : 40, textH + 20));
   return { w, h, lines, subLines };
@@ -83,7 +87,7 @@ export function suggestIcons(name, max = 4) {
 }
 export function collectIcons(model, warnings) {
   const used = {};
-  for (const n of model.nodes) {
+  for (const n of [...model.nodes, ...(model.groups ?? [])]) {
     if (!n.icon) continue;
     const real = resolveIcon(n.icon);
     if (!real) {
@@ -94,6 +98,7 @@ export function collectIcons(model, warnings) {
     n.icon = real;
     used[real] = icons()[real];
   }
+  if (model.nodes.some((n) => n.link)) used[LINK_ICON] = icons()[LINK_ICON];
   model.icons = used;
 }
 

@@ -4,7 +4,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, readd
 import { basename, dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { depsRoot, SHARED_DEPS_DIR } from './lib/deps.mjs';
+import { dep, depsRoot, SHARED_DEPS_DIR } from './lib/deps.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -25,24 +25,32 @@ if (!depsRoot()) {
 const { loadSpec, SpecError, KIND_NAMES, checkTheme } = await import('./lib/spec.mjs');
 const { buildModel } = await import('./lib/build.mjs');
 const { checkModel, formatIssues } = await import('./lib/check.mjs');
-const { htmlPage, reactFiles } = await import('./lib/html.mjs');
-const { renderPng } = await import('./lib/png.mjs');
+const { htmlPage, pageHtml, reactFiles } = await import('./lib/html.mjs');
+const { renderPng, staticSvg, svgToPng } = await import('./lib/png.mjs');
+const { layoutVariants, contactSheet, settingsYaml } = await import('./lib/variants.mjs');
 const { addMetrics, buildMetrics } = await import('./lib/metrics.mjs');
 
 const HELP = `diagram <command> [options]
 
   setup              install the dependencies once (shared cache, survives plugin updates)
 
+  variants <spec>    lay the spec out several ways, measure each, and write a contact sheet to compare
+      --out <dir>        output folder (default: <name>.variants/ next to the spec)
+      --count <n>        how many to keep, best first (default 6)
+      --aspect <w/h>     prefer this shape, for example 1.6 for a page or 0.6 for a phone
   build <spec>       layout, check, and write <name>.layout.json, <name>.html, <name>.png
       --out <dir>        output folder (default: next to the spec)
       --name <name>      file name stem (default: spec file name)
       --tokens <file>    host theme tokens JSON ({ light: {...}, dark: {...}, fonts: {...} })
       --metrics <file>   extra font metrics from \`diagram metrics\` (host fonts)
+      --spacing <factor> more room between parts and rows (graph kinds), parts keep their size
       --dark             also write <name>.dark.png
       --react [dir]      also write a React component folder
       --strict           treat an unapproved brief as an error
       --no-png --no-html --no-fonts
   check <spec|layout.json>   report geometry and fact issues (exit 1 on errors)
+  page <page.yaml>   several diagrams on one page (overview plus focused views, or a gallery)
+      --out <file>       output page (default: index.html next to page.yaml)
   png <spec|layout.json>     write a PNG preview (--theme dark, --out file, --scale 2)
   react <spec> --out <dir>   write Diagram.tsx, the viewer module, CSS and the layout JSON
   metrics <font.ttf|otf|woff> --as sans-500   measure a host font (keys: sans-400/500/600, mono-400/500)
@@ -78,7 +86,8 @@ async function modelFrom(file, args) {
   if (args.metrics) addMetrics(resolve(args.metrics));
   if (/\.layout\.json$/i.test(file)) return { model: JSON.parse(readFileSync(file, 'utf8')), warnings: [] };
   const spec = loadSpec(file);
-  return buildModel(spec);
+  const { spacingOptions } = await import('./lib/layout-graph.mjs');
+  return buildModel(spec, { options: args.spacing ? spacingOptions(args.spacing) : undefined });
 }
 
 const tokensFrom = (args) => (args.tokens ? checkTheme(JSON.parse(readFileSync(resolve(args.tokens), 'utf8')), '--tokens') : {});
@@ -117,7 +126,55 @@ async function main() {
   }
 
   if (!target) { console.error(HELP); return 1; }
+
+  if (cmd === 'page') {
+    const manifestPath = resolve(target);
+    const manifest = dep('yaml').parse(readFileSync(manifestPath, 'utf8')) ?? {};
+    if (!Array.isArray(manifest.sections) || !manifest.sections.length) throw new SpecError('A page needs "sections": a list of { spec: path, label, title, text, showSpec }.');
+    const base = dirname(manifestPath);
+    const entries = [];
+    let ok = true;
+    for (const section of manifest.sections) {
+      if (section?.iframe || section?.heading) { entries.push({ section, model: null }); continue; }
+      if (!section?.spec) throw new SpecError('Every page section needs "spec: <path to a diagram spec>" or "iframe: <page>".');
+      const specPath = resolve(base, String(section.spec));
+      const built = await buildModel(loadSpec(specPath));
+      console.log(`${basename(specPath)}:`);
+      ok = report(built.model, built.warnings, args).ok && ok;
+      entries.push({ section, model: built.model, specText: readFileSync(specPath, 'utf8') });
+    }
+    const out = resolve(args.out ?? join(base, 'index.html'));
+    writeFileSync(out, pageHtml(manifest, entries, { tokens: tokensFrom(args), embedFonts: args.fonts !== false }));
+    console.log(`→ ${out}`);
+    return ok ? 0 : 1;
+  }
+
   const file = resolve(target);
+
+  if (cmd === 'variants') {
+    if (args.metrics) addMetrics(resolve(args.metrics));
+    const spec = loadSpec(file);
+    const name = safeName(args.name ?? stem(file));
+    const outDir = resolve(args.out ?? join(dirname(file), `${name}.variants`));
+    const started = performance.now();
+    const { variants, distinct, combinations } = await layoutVariants(spec, { count: Math.max(1, Number(args.count ?? 6)), aspect: args.aspect ? Number(args.aspect) : undefined });
+    mkdirSync(outDir, { recursive: true });
+    for (const v of variants) {
+      writeFileSync(join(outDir, `${v.name}.layout.json`), `${JSON.stringify(v.model, null, 1)}\n`);
+      writeFileSync(join(outDir, `${v.name}.png`), renderPng(v.model, { theme: 'light' }).png);
+    }
+    writeFileSync(join(outDir, 'variants.json'), `${JSON.stringify(variants.map(({ name: n, label, settings, stats }) => ({ name: n, label, settings, stats })), null, 1)}\n`);
+    const sheet = join(outDir, 'sheet.png');
+    writeFileSync(sheet, svgToPng(contactSheet(variants, (m, idPrefix) => staticSvg(m, { title: false, background: false, idPrefix })), { scale: 1 }));
+    console.log(`${variants.length} of ${distinct} distinct layouts (${combinations} tried) in ${((performance.now() - started) / 1000).toFixed(1)} s, best first:`);
+    for (const v of variants) {
+      const s = v.stats;
+      console.log(`${v.name}  ${v.label}\n    ${s.crossings} crossings · ${s.errors} errors · ${s.warnings} warnings · ${s.bends} bends · ${s.width}×${s.height}\n    ${settingsYaml(v.settings).replace(/\n/g, '\n    ')}`);
+    }
+    console.log(`→ ${sheet}\nLook at the sheet, pick the one that tells the story best, put its lines in the spec, then build.`);
+    return 0;
+  }
+
   const { model, warnings } = await modelFrom(file, args);
 
   if (cmd === 'check') return report(model, warnings, args).ok ? 0 : 1;

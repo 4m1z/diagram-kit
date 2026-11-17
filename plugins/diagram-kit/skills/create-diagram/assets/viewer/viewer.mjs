@@ -17,13 +17,19 @@ const svgIcon = (name) => `<svg viewBox="0 0 24 24" width="16" height="16" fill=
 const escHtml = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const isUrl = (s) => /^https?:\/\//.test(s);
 
+let mounts = 0;
+
+// options.embedded: the diagram sits inside a scrolling page. Plain wheel and vertical swipes
+// scroll the page; Ctrl/⌘ + wheel, pinch and horizontal drags move the diagram.
 export function mountDiagram(root, model, options = {}) {
-  const opt = { themeToggle: true, themeTarget: document.documentElement, header: true, stepMs: 1500, ...options };
+  const opt = { themeToggle: true, themeTarget: document.documentElement, header: true, stepMs: 1500, embedded: false, ...options };
+  const idPrefix = `dk${++mounts}`;
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   root.classList.add('dk-root');
+  if (opt.embedded) root.classList.add('dk-embedded');
   const flows = model.flows ?? [];
   root.innerHTML =
-    `<div class="dk-stage" tabindex="0" aria-label="${escHtml(model.title || 'Diagram')}">${renderSvg(model, { mode: 'vars' })}</div>` +
+    `<div class="dk-stage" tabindex="0" aria-label="${escHtml(model.title || 'Diagram')}">${renderSvg(model, { mode: 'vars', idPrefix })}</div>` +
     (opt.header && model.title ? `<header class="dk-head"><h1>${escHtml(model.title)}${model.draft ? '<span class="dk-draft" title="The brief behind this diagram is not approved yet">Draft</span>' : ''}</h1>${model.subtitle ? `<p>${escHtml(model.subtitle)}</p>` : ''}</header>` : '') +
     `<div class="dk-tools" role="toolbar">` +
     `<button data-act="out" title="Zoom out (−)">${svgIcon('minus')}</button><button data-act="in" title="Zoom in (+)">${svgIcon('plus')}</button><button data-act="fit" title="Fit (F)">${svgIcon('fit')}</button>` +
@@ -81,6 +87,7 @@ export function mountDiagram(root, model, options = {}) {
     apply();
   };
   const onWheel = (ev) => {
+    if (opt.embedded && !(ev.ctrlKey || ev.metaKey)) return; // let the page scroll
     ev.preventDefault();
     const r = stage.getBoundingClientRect();
     if (ev.ctrlKey || ev.metaKey) zoomAt(Math.exp(-ev.deltaY * 0.01), ev.clientX - r.left, ev.clientY - r.top);
@@ -200,7 +207,8 @@ export function mountDiagram(root, model, options = {}) {
     return `<li><span class="dk-fid">${escHtml(id)}</span><span>${kind}${escHtml(f.text)}${src ? `<span class="dk-src">${src}</span>` : ''}</span></li>`;
   };
   const show = (item, type) => {
-    const title = type === 'edge' ? `${model.nodes.find((n) => n.id === item.from)?.label ?? item.from} → ${model.nodes.find((n) => n.id === item.to)?.label ?? item.to}` : item.label;
+    const name = (id) => (model.nodes.find((n) => n.id === id) ?? model.groups?.find((g) => g.id === id))?.label ?? id;
+    const title = type === 'edge' ? `${name(item.from)} → ${name(item.to)}` : item.label;
     const sub = type === 'edge' ? item.label : item.sub;
     const details = item.details ? `<dl>${Object.entries(item.details).map(([k, v]) => `<dt>${escHtml(k)}</dt><dd>${escHtml(v)}</dd>`).join('')}</dl>` : '';
     const facts = item.facts?.length ? `<ul class="dk-facts">${item.facts.map(factHtml).join('')}</ul>` : '';
@@ -360,7 +368,7 @@ export function mountDiagram(root, model, options = {}) {
       root.removeEventListener('click', onRootClick);
       (opt.keyTarget ?? window).removeEventListener('keydown', onKey);
       root.innerHTML = '';
-      root.classList.remove('dk-root');
+      root.classList.remove('dk-root', 'dk-embedded');
     },
   };
 }

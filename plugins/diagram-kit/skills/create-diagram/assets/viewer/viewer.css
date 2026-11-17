@@ -19,6 +19,7 @@
   background-image: radial-gradient(circle at 1px 1px, var(--dk-dot) 0.9px, transparent 0);
 }
 .dk-stage.is-dragging { cursor: grabbing; }
+.dk-embedded .dk-stage { touch-action: pan-y pinch-zoom; }
 .dk-stage svg { display: block; user-select: none; -webkit-user-select: none; }
 
 /* Header: title and one line, nothing more. */
@@ -117,6 +118,8 @@
 /* Diagram states. */
 .dk-node, .dk-edge, .dk-edge-label, .dk-group-label { cursor: pointer; }
 .dk-node[data-shape="note"] { cursor: default; }
+.dk-link .dk-icon { transition: stroke 120ms ease; }
+.dk-link:hover .dk-icon, .dk-link:focus-visible .dk-icon { stroke: var(--dk-accent); }
 .dk-node, .dk-edge, .dk-edge-label, .dk-group, .dk-bar, .dk-lifeline { transition: opacity 160ms ease; }
 .dk-svg.dk-dim .dk-node, .dk-svg.dk-dim .dk-edge, .dk-svg.dk-dim .dk-edge-label, .dk-svg.dk-dim .dk-bar, .dk-svg.dk-dim .dk-lifeline { opacity: 0.2; }
 .dk-svg.dk-dim .dk-group, .dk-svg.dk-dim .dk-group-label { opacity: 0.55; }

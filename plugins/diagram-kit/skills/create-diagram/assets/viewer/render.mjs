@@ -16,7 +16,7 @@ export const EDGE_KINDS = {
   weak: { dash: null, color: 'edge' },
 };
 
-export function createPaint({ mode = 'vars', theme = 'light', over = {}, families = {} } = {}) {
+export function createPaint({ mode = 'vars', theme = 'light', over = {}, families = {}, idPrefix = 'dk' } = {}) {
   const t = { ...tokens[theme], ...(over[theme] ?? {}) };
   const color = (name) => (mode === 'vars' ? `var(${cssVar(name)})` : (t[name] ?? name));
   // One attribute string per element. Vars mode packs everything into `style` so var() works.
@@ -44,7 +44,9 @@ export function createPaint({ mode = 'vars', theme = 'light', over = {}, familie
     if (css.length) out.push(`style="${esc(css.join(';'))}"`);
     return out.join(' ');
   };
-  return { mode, theme, color, attrs, tokens: t };
+  // SVG ids are prefixed per diagram so several diagrams can share one page.
+  const ref = (name) => `url(#${idPrefix}-${name})`;
+  return { mode, theme, color, attrs, tokens: t, ref, idPrefix };
 }
 
 // Orthogonal polyline with rounded corners, shortened at the end to leave room for the arrow.
@@ -131,7 +133,7 @@ function nodeSvg(model, n, p) {
     case 'diamond': {
       const cx = n.x + n.w / 2;
       const cy = n.y + n.h / 2;
-      parts.push(`<path d="M${n1(cx)},${n1(n.y)} L${n1(n.x + n.w)},${n1(cy)} L${n1(cx)},${n1(n.y + n.h)} L${n1(n.x)},${n1(cy)} Z" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="url(#dk-shadow)"/>`);
+      parts.push(`<path d="M${n1(cx)},${n1(n.y)} L${n1(n.x + n.w)},${n1(cy)} L${n1(cx)},${n1(n.y + n.h)} L${n1(n.x)},${n1(cy)} Z" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="${p.ref('shadow')}"/>`);
       parts.push(centeredText());
       break;
     }
@@ -153,7 +155,7 @@ function nodeSvg(model, n, p) {
     }
     case 'table': {
       const H = S.tableHeader;
-      parts.push(`<rect x="${n1(n.x)}" y="${n1(n.y)}" width="${n1(n.w)}" height="${n1(n.h)}" rx="${S.radius}" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="url(#dk-shadow)"/>`);
+      parts.push(`<rect x="${n1(n.x)}" y="${n1(n.y)}" width="${n1(n.w)}" height="${n1(n.h)}" rx="${S.radius}" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="${p.ref('shadow')}"/>`);
       parts.push(`<path d="M${n1(n.x)},${n1(n.y + H)} H${n1(n.x + n.w)}" ${p.attrs({ stroke: 'border', sw: S.stroke })}/>`);
       let tx = n.x + 12;
       if (n.icon) {
@@ -176,7 +178,7 @@ function nodeSvg(model, n, p) {
     }
     default: {
       const rx = n.shape === 'pill' ? n.h / 2 : S.radius;
-      parts.push(`<rect x="${n1(n.x)}" y="${n1(n.y)}" width="${n1(n.w)}" height="${n1(n.h)}" rx="${n1(rx)}" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="url(#dk-shadow)"/>`);
+      parts.push(`<rect x="${n1(n.x)}" y="${n1(n.y)}" width="${n1(n.w)}" height="${n1(n.h)}" rx="${n1(rx)}" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="${p.ref('shadow')}"/>`);
       if (n.icon) {
         const ix = n.x + S.padX;
         parts.push(iconSvg(model, n.icon, ix, n.y + n.h / 2 - S.icon / 2, S.icon, p, toneColor ?? 'muted'));
@@ -186,7 +188,23 @@ function nodeSvg(model, n, p) {
       } else parts.push(centeredText());
     }
   }
+  if (safeLink(n.link) && model.icons?.[LINK_ICON]) parts.push(linkSvg(model, n, p));
   return `<g class="dk-node" data-id="${esc(n.id)}" data-shape="${esc(n.shape ?? 'box')}">${parts.join('')}</g>`;
+}
+
+// A part with a link gets a very small arrow in its top-right corner that opens the link in a new
+// tab (the viewer lets clicks on links through instead of selecting the part).
+export const LINK_ICON = 'arrow-up-right';
+export const safeLink = (url) => typeof url === 'string' && /^https?:\/\/[^\s"'<>]+$/i.test(url);
+function linkSvg(model, n, p) {
+  const S = sizes;
+  const x = n.x + n.w - S.linkIcon - S.linkInset;
+  const y = n.y + S.linkInset;
+  const pad = 4;
+  return `<a class="dk-link" href="${esc(n.link)}" target="_blank" rel="noopener noreferrer"><title>${esc(n.link)}</title>` +
+    `<rect x="${n1(x - pad)}" y="${n1(y - pad)}" width="${n1(S.linkIcon + 2 * pad)}" height="${n1(S.linkIcon + 2 * pad)}" rx="4" ${p.attrs({ fill: 'surface', opacity: 0 })}/>` +
+    iconSvg(model, LINK_ICON, x, y, S.linkIcon, p, 'muted') +
+    `</a>`;
 }
 
 function groupSvg(g, p) {
@@ -200,14 +218,28 @@ function groupSvg(g, p) {
       (g.label ? `<rect x="${n1(g.x + tagW + 4)}" y="${n1(g.y + 3)}" width="${n1(g.labelW ?? 0)}" height="14" rx="3" ${p.attrs({ fill: 'bg', opacity: 0.92 })}/><text x="${n1(g.x + tagW + 8)}" y="${n1(baseline(g.y + 10, S.edge))}" ${p.attrs({ fill: 'muted', font: ['mono', 400, S.edge] })}>${esc(g.label)}</text>` : '') +
       `</g>`;
   }
+  // A group with an icon is a part that holds smaller parts: drawn like a part, its name on top.
+  if (g.icon) {
+    return `<g class="dk-group dk-container" data-id="${esc(g.id)}">` +
+      `<rect x="${n1(g.x)}" y="${n1(g.y)}" width="${n1(g.w)}" height="${n1(g.h)}" rx="${S.radius}" ${p.attrs({ fill: 'surface', stroke: g.tone === 'accent' ? 'accent' : 'border', sw: S.stroke })} filter="${p.ref('shadow')}"/>` +
+      `</g>`;
+  }
   return `<g class="dk-group" data-id="${esc(g.id)}">` +
     `<rect x="${n1(g.x)}" y="${n1(g.y)}" width="${n1(g.w)}" height="${n1(g.h)}" rx="${S.groupRadius}" ${p.attrs({ fill: 'group', stroke: 'groupBorder', sw: S.stroke })}/>` +
     `</g>`;
 }
 
 // Group labels are drawn above the wires with a halo, so a wire entering the group passes behind them.
-function groupLabelSvg(g, p) {
+function groupLabelSvg(g, p, model) {
   const S = sizes;
+  if (g.icon) {
+    const cy = g.y + S.containerHead / 2;
+    const tx = g.x + S.padX + S.icon + S.iconGap;
+    return `<g class="dk-group-label" data-id="${esc(g.id)}">` +
+      iconSvg(model, g.icon, g.x + S.padX, cy - S.icon / 2, S.icon, p, g.tone ?? 'muted') +
+      textLines([String(g.label ?? '')], tx, cy - S.lineHeight / 2, S.lineHeight, S.label, p.attrs({ fill: 'text', font: ['sans', S.labelWeight, S.label] })) +
+      `</g>`;
+  }
   const label = String(g.label ?? '').toUpperCase();
   if (!label && !g.tone) return '';
   const dot = g.tone ? `<circle cx="${n1(g.x + 16)}" cy="${n1(g.y + 17)}" r="3" ${p.attrs({ fill: g.tone })}/>` : '';
@@ -253,11 +285,11 @@ export function renderSvg(model, opts = {}) {
   const o = [];
   o.push(`<svg xmlns="http://www.w3.org/2000/svg" class="dk-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`);
   const shadowColor = p.mode === 'vars' ? 'var(--dk-shadow)' : p.tokens.shadow;
-  o.push(`<defs><filter id="dk-shadow" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="${shadowColor}"/></filter>` +
-    `<pattern id="dk-dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" ${p.attrs({ fill: 'dot' })}/></pattern></defs>`);
+  o.push(`<defs><filter id="${p.idPrefix}-shadow" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="${shadowColor}"/></filter>` +
+    `<pattern id="${p.idPrefix}-dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" ${p.attrs({ fill: 'dot' })}/></pattern></defs>`);
   if (opts.background) {
     o.push(`<rect width="${W}" height="${H}" ${p.attrs({ fill: 'bg' })}/>`);
-    o.push(`<rect width="${W}" height="${H}" fill="url(#dk-dots)"/>`);
+    o.push(`<rect width="${W}" height="${H}" fill="${p.ref('dots')}"/>`);
   }
   if (opts.title && model.title) {
     o.push(`<text x="32" y="${n1(baseline(34, sizes.title))}" ${p.attrs({ fill: 'text', font: ['sans', 600, sizes.title] })}>${esc(model.title)}</text>`);
@@ -281,7 +313,7 @@ export function renderSvg(model, opts = {}) {
     if (l.label) o.push(`<rect x="${n1(l.x1 + 4)}" y="${n1(l.y1 + 4)}" width="${n1(l.labelW ?? 0)}" height="15" rx="3" ${p.attrs({ fill: 'bg', opacity: 0.92 })}/><text x="${n1(l.x1 + 8)}" y="${n1(baseline(l.y1 + 12, sizes.edge))}" ${p.attrs({ fill: 'muted', font: ['mono', 400, sizes.edge] })}>${esc(l.label)}</text>`);
   }
   for (const e of model.edges ?? []) o.push(edgeSvg(e, p));
-  for (const g of groups.filter((x) => x.variant !== 'fragment')) o.push(groupLabelSvg(g, p));
+  for (const g of groups.filter((x) => x.variant !== 'fragment')) o.push(groupLabelSvg(g, p, model));
   for (const n of model.nodes ?? []) o.push(nodeSvg(model, n, p));
   for (const e of model.edges ?? []) o.push(edgeLabelSvg(e, p));
   o.push('</g></svg>');

@@ -12,18 +12,23 @@ export function familyNames(tokens = {}) {
   return { sans: tokens.fonts?.pngSans ?? 'Geist', mono: tokens.fonts?.pngMono ?? 'Geist Mono' };
 }
 
-export function staticSvg(model, { theme = 'light', tokens = {} } = {}) {
+export function staticSvg(model, { theme = 'light', tokens = {}, idPrefix = 'dk', title = true, background = true } = {}) {
   const over = { light: { ...(model.theme?.light ?? {}), ...(tokens.light ?? {}) }, dark: { ...(model.theme?.dark ?? {}), ...(tokens.dark ?? {}) } };
-  return renderSvg(model, { mode: 'literal', theme, over, families: familyNames(tokens), background: true, title: true });
+  return renderSvg(model, { mode: 'literal', theme, over, families: familyNames(tokens), background, title, idPrefix });
+}
+
+// Any SVG to PNG with the bundled fonts (and system fonts when a host font is asked for).
+export function svgToPng(svg, { scale = 2, systemFonts = false } = {}) {
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: 'zoom', value: scale },
+    font: { fontFiles: FILES.map((f) => FONTS + f), loadSystemFonts: systemFonts, defaultFontFamily: 'Geist' },
+  });
+  return resvg.render().asPng();
 }
 
 export function renderPng(model, { theme = 'light', scale = 2, tokens = {} } = {}) {
   tokens = { ...tokens, fonts: { ...(model.theme?.fonts ?? {}), ...(tokens.fonts ?? {}) } };
   const svg = staticSvg(model, { theme, tokens });
-  const resvg = new Resvg(svg, {
-    fitTo: { mode: 'zoom', value: scale },
-    // Host fonts (theme.fonts.pngSans / pngMono) come from the system; otherwise only bundled Geist.
-    font: { fontFiles: FILES.map((f) => FONTS + f), loadSystemFonts: Boolean(tokens.fonts?.pngSans || tokens.fonts?.pngMono || model.theme?.fonts?.pngSans), defaultFontFamily: 'Geist' },
-  });
-  return { png: resvg.render().asPng(), svg };
+  // Host fonts (theme.fonts.pngSans / pngMono) come from the system; otherwise only bundled Geist.
+  return { png: svgToPng(svg, { scale, systemFonts: Boolean(tokens.fonts?.pngSans || tokens.fonts?.pngMono || model.theme?.fonts?.pngSans) }), svg };
 }

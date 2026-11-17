@@ -77,6 +77,9 @@ export const sizes = {
   subtitle: 12.5,
   radius: 8,
   groupRadius: 12,
+  linkIcon: 11, // the arrow in the corner of a part with a link
+  linkInset: 6,
+  containerHead: 40, // the name row of a group drawn as a part (a group with an icon)
   corner: 7,
   stroke: 1,
   edgeStroke: 1.25,

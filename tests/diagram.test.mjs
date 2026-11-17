@@ -12,9 +12,10 @@ const { loadSpec, normalizeSpec, parseEdge, SpecError } = await imp('scripts/lib
 const { buildModel } = await imp('scripts/lib/build.mjs');
 const { checkModel } = await imp('scripts/lib/check.mjs');
 const { parseBrief } = await imp('scripts/lib/model.mjs');
-const { htmlPage, bundleViewer, reactFiles } = await imp('scripts/lib/html.mjs');
+const { htmlPage, bundleViewer, reactFiles, pageHtml } = await imp('scripts/lib/html.mjs');
 const { staticSvg } = await imp('scripts/lib/png.mjs');
 const { measure, wrap } = await imp('scripts/lib/metrics.mjs');
+const { dep } = await imp('scripts/lib/deps.mjs');
 
 const EXAMPLES = `${SKILL}examples/`;
 
@@ -210,4 +211,189 @@ test('a copy without node_modules points at setup instead of crashing', () => {
 test('unknown fields are reported (a comma in a YAML flow value splits it)', () => {
   const s = normalizeSpec({ nodes: [{ id: 'a', sub: 'measures', previews: null }] });
   assert.ok(s.warnings.some((w) => w.code === 'field' && /previews/.test(w.message)));
+});
+
+test('a page holds several diagrams with distinct ids and only safe links', async () => {
+  const a = await buildModel(loadSpec(`${EXAMPLES}tree.yaml`));
+  const b = await buildModel(loadSpec(`${EXAMPLES}sequence.yaml`));
+  const html = pageHtml(
+    { title: 'Demo <b>', repo: 'javascript:alert(1)', sections: [{ spec: 'a', hero: true }, { spec: 'b', label: 'Sequence', showSpec: true }] },
+    [{ section: { hero: true }, model: a.model }, { section: { label: 'Sequence', showSpec: true }, model: b.model, specText: 'kind: sequence # <script>' }],
+  );
+  assert.equal((html.match(/class="pg-frame"/g) ?? []).length, 2);
+  assert.doesNotMatch(html, /javascript:alert/);
+  assert.doesNotMatch(html, /<b>|# <script>/);
+  assert.doesNotMatch(html, /<script[^>]+src=|<link[^>]+href=/);
+  assert.match(html, /embedded: true/);
+  // Headings and embedded pages take no diagram slot: frame i shows the i-th diagram.
+  const mixed = pageHtml({ title: 'x', sections: [] }, [
+    { section: { heading: 'How it works' } },
+    { section: { label: 'A' }, model: a.model },
+    { section: { iframe: '3d/index.html', title: '3D' } },
+    { section: { label: 'B' }, model: b.model },
+  ]);
+  const models = JSON.parse(mixed.match(/id="diagram-models">([^<]*)</)[1].replace(/\\u003c/g, '<'));
+  assert.deepEqual(models.map((m) => m.kind), ['tree', 'sequence']);
+  assert.deepEqual([...mixed.matchAll(/data-i="(\d+)"/g)].map((m) => m[1]), ['0', '1']);
+  assert.throws(() => pageHtml({ sections: [] }, [{ section: { iframe: 'javascript:alert(1)' } }]), /iframe/);
+});
+
+test('--spacing widens gaps but keeps every part its size', async () => {
+  const { spacingOptions } = await imp('scripts/lib/layout-graph.mjs');
+  const spec = loadSpec(`${EXAMPLES}architecture.yaml`);
+  const a = (await buildModel(spec)).model;
+  const b = (await buildModel(loadSpec(`${EXAMPLES}architecture.yaml`), { options: spacingOptions(4) })).model;
+  assert.ok(b.width > a.width * 1.5);
+  for (const n of a.nodes) {
+    const m = b.nodes.find((x) => x.id === n.id);
+    assert.equal(m.w, n.w);
+    assert.equal(m.h, n.h);
+  }
+  assert.equal(checkModel(b).ok, true);
+  // Spacing reaches inside groups too (ELK reads it per group).
+  const gap = (m) => { const p = m.nodes.find((n) => n.id === 'api'); const q = m.nodes.find((n) => n.id === 'writer'); return Math.abs(q.y - p.y) - p.h; };
+  assert.ok(gap(b) > gap(a) * 2, `inside-group gap grew: ${gap(a)} -> ${gap(b)}`);
+  // Groups use the same spacing as the root by default (ELK's own default would be 20).
+  assert.ok(gap(a) >= 26, `inside-group gap matches the root: ${gap(a)}`);
+  assert.throws(() => spacingOptions(0), /positive/);
+});
+
+test('layout: { spacing } in the spec equals --spacing', async () => {
+  const { spacingOptions } = await imp('scripts/lib/layout-graph.mjs');
+  const viaFlag = (await buildModel(loadSpec(`${EXAMPLES}architecture.yaml`), { options: spacingOptions(2) })).model;
+  const spec = loadSpec(`${EXAMPLES}architecture.yaml`);
+  const viaSpec = (await buildModel({ ...spec, layout: { ...spec.layout, spacing: 2 } })).model;
+  assert.deepEqual(viaSpec.nodes.map((n) => [n.id, n.x, n.y]), viaFlag.nodes.map((n) => [n.id, n.x, n.y]));
+});
+
+test('variants differ visibly, show both directions, and the printed settings rebuild them exactly', async () => {
+  const { layoutVariants, contactSheet, settingsYaml } = await imp('scripts/lib/variants.mjs');
+  const spec = loadSpec(`${EXAMPLES}architecture.yaml`);
+  const { variants } = await layoutVariants(spec, { count: 6 });
+  assert.ok(variants.length >= 2);
+  assert.deepEqual([...new Set(variants.map((v) => v.settings.direction))].sort(), ['down', 'right']);
+  for (let i = 1; i < variants.length; i++) assert.ok(variants[i].stats.score >= variants[i - 1].stats.score || variants[i].settings.direction !== spec.direction);
+  for (const v of variants) {
+    const yaml = dep('yaml').parse(settingsYaml(v.settings));
+    const again = (await buildModel({ ...spec, direction: yaml.direction, layout: { ...spec.layout, ...(yaml.layout ?? {}) } })).model;
+    assert.deepEqual(again.nodes.map((n) => [n.id, n.x, n.y]), v.model.nodes.map((n) => [n.id, n.x, n.y]), `${v.name} rebuilds from its settings`);
+  }
+  const sheet = contactSheet(variants, (m, idPrefix) => staticSvg(m, { title: false, background: false, idPrefix }));
+  for (const v of variants) assert.equal(sheet.split(`id="${v.name}-shadow"`).length - 1, 1, `${v.name} has its own ids`);
+  await assert.rejects(layoutVariants(loadSpec(`${EXAMPLES}sequence.yaml`)), /one layout/);
+});
+
+test('the variants command writes a contact sheet, one preview per variant and their settings', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dk-var-'));
+  const out = execFileSync('node', [SKILL + 'scripts/diagram.mjs', 'variants', SKILL + 'examples/flowchart.yaml', '--out', dir, '--count', '3'], { encoding: 'utf8' });
+  assert.match(out, /v1 {2}/);
+  const files = readdirSync(dir);
+  assert.ok(files.includes('sheet.png') && files.includes('variants.json') && files.includes('v1.png') && files.includes('v1.layout.json'));
+});
+
+test('a group with its own direction runs across the picture, and wires reach its parts or the group', async () => {
+  const raw = {
+    kind: 'architecture', direction: 'down',
+    groups: [{ id: 'kit', label: 'Kit', direction: 'right' }],
+    nodes: [{ id: 'you', label: 'You' }, { id: 'a', label: 'A', group: 'kit' }, { id: 'b', label: 'B', group: 'kit' }, { id: 'c', label: 'C', group: 'kit' }, { id: 'out', label: 'Out' }],
+    edges: ['you -> kit: ask', 'a -> b', 'b -> c', 'you -> a', 'c -> out'],
+  };
+  const { model } = await buildModel(normalizeSpec(raw));
+  const at = Object.fromEntries(model.nodes.map((n) => [n.id, n]));
+  const kit = model.groups.find((g) => g.id === 'kit');
+  assert.equal(kit.direction, 'right');
+  // One row, left to right, inside the group, which sits between You and Out.
+  assert.ok(at.a.y === at.b.y && at.b.y === at.c.y && at.a.x < at.b.x && at.b.x < at.c.x);
+  for (const n of [at.a, at.b, at.c]) assert.ok(n.x >= kit.x && n.x + n.w <= kit.x + kit.w && n.y >= kit.y && n.y + n.h <= kit.y + kit.h);
+  assert.ok(at.you.y + at.you.h < kit.y && kit.y + kit.h < at.out.y);
+  const wire = Object.fromEntries(model.edges.map((e) => [e.id, e.points]));
+  // A wire to the group ends on its border; a wire to a part inside runs on to that part.
+  assert.equal(wire['you->kit'].at(-1)[1], kit.y);
+  assert.equal(wire['you->a'].at(-1)[1], at.a.y);
+  assert.equal(wire['c->out'][0][1], at.c.y + at.c.h);
+  assert.equal(wire['a->b'][0][1], wire['a->b'].at(-1)[1]);
+  const c = checkModel(model);
+  assert.equal(c.issues.filter((i) => i.level !== 'info').length, 0, JSON.stringify(c.issues));
+  // A plain group (same direction as the picture) takes wires too.
+  const plain = await buildModel(normalizeSpec({ ...raw, direction: 'right' }));
+  assert.ok(plain.model.edges.every((e) => e.points.length >= 2));
+  assert.throws(() => normalizeSpec({ kind: 'architecture', groups: [{ id: 'g' }], nodes: [{ id: 'a', group: 'g' }], edges: ['a -> g'] }), /group it sits in/);
+  assert.throws(() => normalizeSpec({ kind: 'architecture', direction: 'down', groups: [{ id: 'g', direction: 'right' }, { id: 'h', parent: 'g' }], nodes: [] }), /holds parts only/);
+  assert.throws(() => normalizeSpec({ kind: 'architecture', groups: [{ id: 'g', direction: 'sideways' }], nodes: [] }), /direction must be/);
+});
+
+test('back wires inside a group loop along the side, keep the main line straight and share one return line', async () => {
+  const raw = {
+    kind: 'flowchart', direction: 'down',
+    groups: [{ id: 'kit', label: 'Kit' }],
+    nodes: [{ id: 'go', label: 'Go' }, { id: 'a', label: 'Shape it', group: 'kit' }, { id: 'b', label: 'Lay it out', group: 'kit' }, { id: 'c', label: 'Check by code', group: 'kit' }, { id: 'd', label: 'Check by eye', group: 'kit' }, { id: 'out', label: 'Ship' }],
+    edges: [
+      { from: 'go', to: 'a', main: true }, { from: 'a', to: 'b', main: true }, { from: 'b', to: 'c', main: true }, { from: 'c', to: 'd', main: true }, { from: 'd', to: 'out', main: true },
+      { from: 'd', to: 'a', label: 'wrong', kind: 'return', back: true }, { from: 'c', to: 'a', kind: 'return', back: true },
+    ],
+  };
+  const { model } = await buildModel(normalizeSpec(raw));
+  const at = Object.fromEntries(model.nodes.map((n) => [n.id, n]));
+  // The main line is one straight column, in order.
+  const centres = model.nodes.map((n) => Math.round(n.x + n.w / 2));
+  assert.ok(centres.every((x) => x === centres[0]), centres.join(','));
+  for (const [p, q] of [['go', 'a'], ['a', 'b'], ['b', 'c'], ['c', 'd'], ['d', 'out']]) assert.ok(at[p].y < at[q].y);
+  // Both back wires leave their part's right side and meet on one line into the right side of A.
+  // The shared stretch is drawn once: D's wire runs the whole line with the arrow; C's stops where
+  // it joins, without an arrowhead.
+  const wire = Object.fromEntries(model.edges.map((e) => [e.id, e.points]));
+  for (const [id, from] of [['d->a', at.d], ['c->a', at.c]]) assert.equal(wire[id][0][0], from.x + from.w);
+  assert.equal(wire['d->a'].at(-1)[0], at.a.x + at.a.w);
+  assert.equal(wire['d->a'][1][0], wire['c->a'][1][0]);
+  assert.deepEqual(wire['c->a'].at(-1), [wire['d->a'][1][0], wire['c->a'][0][1]]);
+  assert.equal(model.edges.find((e) => e.id === 'c->a').arrow, false);
+  assert.notEqual(model.edges.find((e) => e.id === 'd->a').arrow, false);
+  // The return line runs outside the group, which keeps to its parts.
+  const kit = model.groups.find((g) => g.id === 'kit');
+  const right = Math.max(...['a', 'b', 'c', 'd'].map((id) => at[id].x + at[id].w));
+  assert.equal(kit.x + kit.w, right + 18);
+  assert.ok(wire['d->a'][1][0] > kit.x + kit.w);
+  const label = model.edges.find((e) => e.id === 'd->a').labelBox;
+  assert.ok(label.x > kit.x + kit.w);
+  const c = checkModel(model);
+  assert.equal(c.stats.crossings, 0);
+  assert.equal(c.issues.filter((i) => i.level !== 'info').length, 0, JSON.stringify(c.issues));
+});
+
+test('a group with an icon is a part holding smaller parts, and sameSize evens out boxes', async () => {
+  const raw = {
+    kind: 'architecture', direction: 'down',
+    layout: { sameSize: ['a', 'c'] },
+    groups: [{ id: 'eng', label: 'Engines', icon: 'sigma', tone: 'blue' }],
+    nodes: [{ id: 'a', label: 'Start here please' }, { id: 'x', label: 'X', group: 'eng' }, { id: 'y', label: 'Y two', group: 'eng' }, { id: 'z', label: 'Zed', group: 'eng' }, { id: 'c', label: 'C' }],
+    edges: [{ from: 'a', to: 'eng', main: true }, { from: 'eng', to: 'c', main: true }],
+  };
+  const { model } = await buildModel(normalizeSpec(raw));
+  const at = Object.fromEntries(model.nodes.map((n) => [n.id, n]));
+  const eng = model.groups.find((g) => g.id === 'eng');
+  assert.equal(eng.icon, 'sigma');
+  assert.ok(model.icons.sigma);
+  // Its parts sit in one row, in order, under its name row, and it stays snug around them.
+  assert.ok(at.x.y === at.y.y && at.y.y === at.z.y && at.x.x < at.y.x && at.y.x < at.z.x);
+  assert.ok(at.x.y >= eng.y + 40 && at.x.x >= eng.x && at.z.x + at.z.w <= eng.x + eng.w);
+  assert.ok(eng.h <= 40 + at.x.h + 24, `container height ${eng.h}`);
+  // Wires stop at its border.
+  const wire = Object.fromEntries(model.edges.map((e) => [e.id, e.points]));
+  assert.equal(wire['a->eng'].at(-1)[1], eng.y);
+  assert.equal(wire['eng->c'][0][1], eng.y + eng.h);
+  // A list evens out just those parts; a list of lists makes sets; true evens out every box.
+  assert.equal(at.a.w, at.c.w);
+  assert.notEqual(at.x.w, at.a.w);
+  const all = await buildModel(normalizeSpec({ ...raw, layout: { sameSize: true } }));
+  assert.equal(new Set(all.model.nodes.map((n) => `${n.w}x${n.h}`)).size, 1);
+  const sets = await buildModel(normalizeSpec({ ...raw, nodes: raw.nodes.map((n) => (n.id === 'y' ? { ...n, sub: 'a second line' } : n)), layout: { sameSize: [['a', 'c'], ['x', 'y', 'z']] } }));
+  const s = Object.fromEntries(sets.model.nodes.map((n) => [n.id, n]));
+  assert.ok(s.x.w === s.y.w && s.y.w === s.z.w && s.x.h === s.y.h && s.y.h === s.z.h && s.x.h > s.a.h);
+  assert.ok(s.a.w === s.c.w && s.a.w !== s.x.w);
+  // It is drawn as a part: its name in the label font, not an uppercase zone label.
+  const svg = staticSvg(model);
+  assert.ok(svg.includes('Engines') && !svg.includes('ENGINES'));
+  assert.throws(() => normalizeSpec({ kind: 'architecture', groups: [{ id: 'g', icon: 'sigma' }, { id: 'h', parent: 'g' }], nodes: [] }), /drawn as a part/);
+  const c = checkModel(model);
+  assert.equal(c.issues.filter((i) => i.level !== 'info').length, 0, JSON.stringify(c.issues));
 });
