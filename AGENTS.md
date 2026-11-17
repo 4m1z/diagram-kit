@@ -13,7 +13,8 @@ plugins/diagram-kit/skills/create-diagram/
   scripts/lib/          spec -> layout (ELK, sequence, mindmap) -> model -> check, png, html
   assets/viewer/        theme tokens, the SVG renderer and the viewer (browser-safe, shared)
   assets/               fonts, Lucide icons, font metrics, licences
-plugins/diagram-kit/.claude-plugin, .codex-plugin   plugin manifests
+plugins/diagram-kit/.claude-plugin, .codex-plugin   plugin manifests (names and versions agree with plugins/diagram-kit/package.json)
+plugins/diagram-kit/skills/create-diagram/agents/openai.yaml   Codex display metadata for the skill
 .claude-plugin/, .agents/plugins/                   marketplaces
 .agents/skills/create-diagram -> the skill (and .claude/skills -> .agents/skills) for dogfooding here
 examples/payments/      the showcase: brief, specs and built outputs

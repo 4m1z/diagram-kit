@@ -51,7 +51,7 @@ npm ci --ignore-scripts --prefix <path-to>/skills/create-diagram/scripts
 
 ## use it
 
-just ask, or call the skill by name (`create-diagram`; in claude code `/diagram-kit:create-diagram`):
+just ask, or call the skill by name (`/diagram-kit:create-diagram` in claude code, `$diagram-kit:create-diagram` in codex):
 
 - "diagram how a request flows through this repo"
 - "turn docs/architecture.md into diagrams"
