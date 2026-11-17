@@ -720,8 +720,8 @@ const mapEl = document.getElementById('map');
 const worldW = world.maxX - world.minX;
 const worldH = world.maxZ - world.minZ;
 const aspect = worldW / worldH;
-const MAP_H = aspect < 1 ? (coarse ? 210 : 300) : Math.round((coarse ? 120 : 190) / aspect);
-const MAP_W = aspect < 1 ? Math.max(coarse ? 90 : 110, Math.round(MAP_H * aspect) + 24) : coarse ? 120 : 190;
+const MAP_H = aspect < 1 ? (coarse ? 240 : 400) : Math.round((coarse ? 140 : 250) / aspect);
+const MAP_W = aspect < 1 ? Math.max(coarse ? 100 : 140, Math.round(MAP_H * aspect) + 24) : coarse ? 140 : 250;
 const mapScale = Math.min((MAP_W - 16) / worldW, (MAP_H - 16) / worldH);
 const dpr = Math.min(devicePixelRatio, 2);
 mapEl.width = MAP_W * dpr;
@@ -753,11 +753,19 @@ mapBase.height = mapEl.height;
     pts.forEach((p, i) => (i ? ctx.lineTo(mx(p.x), my(p.y)) : ctx.moveTo(mx(p.x), my(p.y))));
     ctx.stroke();
   }
+  // Parts are drawn as the diagram draws them: wide white boxes with a coloured edge, sized from
+  // the grid (most of a column wide, about a third of a row tall), so the map reads as the diagram.
   for (const s of signs) {
+    s.mapW = Math.max(16, Math.min(COL * 0.88, Math.max(COL * 0.78, s.w * 1.8)) * mapScale);
+    s.mapH = Math.max(10, ROW * 0.36 * mapScale);
+    const x = mx(s.x) - s.mapW / 2;
+    const y = my(s.z) - s.mapH / 2;
+    ctx.fillStyle = 'rgba(20, 30, 60, 0.18)';
+    ctx.beginPath(); ctx.roundRect(x, y + 1.5, s.mapW, s.mapH, 3); ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.strokeStyle = hex(s.color); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(x, y, s.mapW, s.mapH, 3); ctx.fill(); ctx.stroke();
     ctx.fillStyle = hex(s.color);
-    const w = Math.max(9, s.w * mapScale);
-    const h = Math.max(5, s.h * mapScale);
-    ctx.beginPath(); ctx.roundRect(mx(s.x) - w / 2, my(s.z) - h / 2, w, h, 2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(x + 3, y + s.mapH / 2 - 2, Math.min(10, s.mapW * 0.3), 4, 2); ctx.fill();
   }
   ctx.restore();
 }
@@ -791,8 +799,9 @@ function drawMap(t) {
   const id = targets[state.target];
   if (state.mode === 'play' && !state.done && id) {
     const s = signById.get(id);
+    const pad = 2.5 + (Math.sin(t * 6) + 1) * 1.2;
     mapCtx.strokeStyle = '#ff5d73'; mapCtx.lineWidth = 2;
-    mapCtx.beginPath(); mapCtx.arc(mx(s.x), my(s.z), 6 + Math.sin(t * 6) * 2, 0, Math.PI * 2); mapCtx.stroke();
+    mapCtx.beginPath(); mapCtx.roundRect(mx(s.x) - s.mapW / 2 - pad, my(s.z) - s.mapH / 2 - pad, s.mapW + 2 * pad, s.mapH + 2 * pad, 4 + pad); mapCtx.stroke();
   }
   mapCtx.save();
   mapCtx.translate(mx(state.x), my(state.z));
