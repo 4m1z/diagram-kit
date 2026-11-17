@@ -2,9 +2,11 @@
 // Specs carry meaning only: parts, tiers, groups, flows. Never coordinates.
 import { readFileSync } from 'node:fs';
 import { dirname, resolve, extname } from 'node:path';
-import YAML from 'yaml';
+import { dep } from './deps.mjs';
 import { TONES } from '../../assets/viewer/theme.mjs';
 import { EDGE_KINDS } from '../../assets/viewer/render.mjs';
+
+const YAML = dep('yaml');
 
 export class SpecError extends Error {}
 

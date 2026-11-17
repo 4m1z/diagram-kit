@@ -1,9 +1,10 @@
 // Graph and tree layout with ELK Layered (elkjs). The spec decides meaning (tiers, groups, order,
 // the main path); ELK decides coordinates and orthogonal routes.
-import ELK from 'elkjs/lib/elk.bundled.js';
+import { dep } from './deps.mjs';
 import { sizes as S } from '../../assets/viewer/theme.mjs';
 import { sizeNode, edgeLabelSize, pickInfo } from './model.mjs';
 
+const ELK = dep('elkjs/lib/elk.bundled.js');
 const elk = new ELK();
 const ELK_DIR = { right: 'RIGHT', down: 'DOWN', left: 'LEFT', up: 'UP' };
 const OUT_SIDE = { right: 'EAST', down: 'SOUTH', left: 'WEST', up: 'NORTH' };

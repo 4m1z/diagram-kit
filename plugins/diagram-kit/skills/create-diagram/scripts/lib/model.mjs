@@ -1,11 +1,12 @@
 // Shared pieces of the layout model: node sizing, icons, the brief's facts and final placement.
 import { readFileSync, existsSync } from 'node:fs';
-import YAML from 'yaml';
+import { dep } from './deps.mjs';
 import { fileURLToPath } from 'node:url';
 import { measure, wrap } from './metrics.mjs';
 import { sizes as S } from '../../assets/viewer/theme.mjs';
 
 const ASSETS = fileURLToPath(new URL('../../assets/', import.meta.url));
+const YAML = dep('yaml');
 export const FONT = {
   label: { face: 'sans', weight: S.labelWeight, size: S.label },
   sub: { face: 'mono', weight: 400, size: S.sub },

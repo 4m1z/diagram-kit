@@ -23,7 +23,7 @@ tests/                  node:test suites
 
 ## Commands
 
-- Install once: `npm ci --ignore-scripts --prefix plugins/diagram-kit/skills/create-diagram/scripts`
+- Install once: `npm run setup` (local `node_modules` next to the scripts, used before the shared cache). Installed plugins use `diagram.mjs setup`, which installs into `~/.cache/diagram-kit/deps-<lockfile hash>` because hosts rewrite plugin folders (Codex does on refresh).
 - Tests: `npm test`
 - Rebuild every example and the showcase: `npm run examples`
 - One diagram: `node plugins/diagram-kit/skills/create-diagram/scripts/diagram.mjs build <spec>`

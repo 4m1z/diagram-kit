@@ -44,5 +44,5 @@ Decide this first; it changes the output, not the spec.
 ## Hosts
 
 - **Claude Code**: look at previews with the Read tool. Skills live in `.claude/skills/` (project) or `~/.claude/skills/` (user), or come from the plugin.
-- **Codex**: look at previews with `view_image`. The PNG renderer needs no browser, so it works inside the sandbox. Skills live in `.agents/skills/` or `~/.agents/skills/`, or come from the plugin (installed under `$CODEX_HOME/plugins/cache/`). The one-time `npm ci` needs network and writes there, so request escalation for it; builds afterwards only write to the output folder.
-- Both: run `npm ci` once per install and again after an update. The CLI prints the exact command when it is needed.
+- **Codex**: look at previews with `view_image`. The PNG renderer needs no browser, so it works inside the sandbox. Skills live in `.agents/skills/` or `~/.agents/skills/`, or come from the plugin (`$CODEX_HOME/plugins/cache/`, which Codex rewrites on refresh). The one-time `diagram.mjs setup` needs network and writes to `~/.cache/diagram-kit/`, so request escalation for it; builds afterwards only read that cache and write to the output folder.
+- Both: dependencies live in `~/.cache/diagram-kit/deps-<lockfile hash>` (or `$DIAGRAM_KIT_DEPS`), outside any plugin folder, so one setup serves every host and survives plugin updates that keep the same lockfile. The CLI prints the exact command when setup is needed.

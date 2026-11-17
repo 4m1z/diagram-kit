@@ -1,6 +1,6 @@
 {
   "name": "diagram-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Clear, well-positioned, interactive diagrams: architecture, flows, sequences, state machines, data models, trees and mind maps.",
   "private": true,
   "license": "MIT"

@@ -43,11 +43,13 @@ codex plugin add diagram-kit@diagram-kit
 
 or copy `plugins/diagram-kit/skills/create-diagram` into `.claude/skills/` or `.agents/skills/`.
 
-then once per install (node 22.12+; codex will ask to run it outside the sandbox):
+then once (node 22.12+; one install serves claude code, codex and every copy, and survives plugin updates):
 
 ```
-npm ci --ignore-scripts --prefix <path-to>/skills/create-diagram/scripts
+node <path-to>/skills/create-diagram/scripts/diagram.mjs setup
 ```
+
+it installs the pinned dependencies into `~/.cache/diagram-kit/`. the agent runs it for you the first time (codex asks to run it outside its sandbox).
 
 ## use it
 

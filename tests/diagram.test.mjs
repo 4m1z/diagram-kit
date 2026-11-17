@@ -193,3 +193,16 @@ test('React output is a client component with scoped tokens and bundled fonts', 
   assert.doesNotMatch(files['diagram.css'], /:root \{/);
   assert.ok(files['fonts/Geist-Medium.woff2'].length > 1000);
 });
+
+test('a copy without node_modules points at setup instead of crashing', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dk-nodeps-'));
+  execFileSync('cp', ['-R', join(SKILL, 'scripts', 'lib'), join(SKILL, 'scripts', 'diagram.mjs'), join(SKILL, 'scripts', 'package.json'), join(SKILL, 'scripts', 'package-lock.json'), dir]);
+  let out = '';
+  try {
+    execFileSync('node', [join(dir, 'diagram.mjs'), 'check', 'x.yaml'], { encoding: 'utf8', stdio: 'pipe', env: { ...process.env, DIAGRAM_KIT_DEPS: join(dir, 'none') } });
+  } catch (err) {
+    out = err.stderr;
+    assert.equal(err.status, 2);
+  }
+  assert.match(out, /diagram\.mjs" setup/);
+});

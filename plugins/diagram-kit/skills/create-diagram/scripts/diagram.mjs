@@ -1,12 +1,24 @@
 #!/usr/bin/env node
 // diagram-kit CLI. Spec (meaning) -> layout model (positions) -> HTML / PNG / React.
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
+import { depsRoot, SHARED_DEPS_DIR } from './lib/deps.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-if (!existsSync(join(HERE, 'node_modules', 'elkjs'))) {
-  console.error(`diagram-kit needs its dependencies once:\n  npm ci --ignore-scripts --prefix "${HERE}"`);
+
+// `setup` installs the pinned dependencies once into a shared cache that survives plugin
+// refreshes and updates, and is shared by Claude Code, Codex and any copy of the skill.
+if (process.argv[2] === 'setup') {
+  mkdirSync(SHARED_DEPS_DIR, { recursive: true });
+  for (const f of ['package.json', 'package-lock.json']) copyFileSync(join(HERE, f), join(SHARED_DEPS_DIR, f));
+  console.log(`Installing diagram-kit dependencies into ${SHARED_DEPS_DIR}`);
+  const r = spawnSync('npm', ['ci', '--ignore-scripts', '--no-audit', '--no-fund', '--prefix', SHARED_DEPS_DIR], { stdio: 'inherit', shell: process.platform === 'win32' });
+  process.exit(r.status ?? 1);
+}
+if (!depsRoot()) {
+  console.error(`diagram-kit needs its dependencies once (network needed; shared by every host):\n  node "${join(HERE, 'diagram.mjs')}" setup`);
   process.exit(2);
 }
 
@@ -18,6 +30,8 @@ const { renderPng } = await import('./lib/png.mjs');
 const { addMetrics, buildMetrics } = await import('./lib/metrics.mjs');
 
 const HELP = `diagram <command> [options]
+
+  setup              install the dependencies once (shared cache, survives plugin updates)
 
   build <spec>       layout, check, and write <name>.layout.json, <name>.html, <name>.png
       --out <dir>        output folder (default: next to the spec)

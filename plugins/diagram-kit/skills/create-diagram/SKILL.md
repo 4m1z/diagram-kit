@@ -12,8 +12,8 @@ Turn understanding into a picture that is correct, minimal and easy to read. You
 ## Setup, once per install
 
 - Node 22.12 or newer.
-- `npm ci --ignore-scripts --prefix <skill>/scripts` (needs network; repeat after the skill or plugin updates). In Codex the skill usually sits outside the workspace, so ask to run this command with escalated permissions.
-- CLI: `node <skill>/scripts/diagram.mjs` (`help` lists commands). It prints the setup command itself when dependencies are missing.
+- `node <skill>/scripts/diagram.mjs setup` once: installs the pinned dependencies into `~/.cache/diagram-kit/` (needs network). The install is shared by Claude Code, Codex and every copy of the skill, and survives plugin refreshes; a new release with new dependencies asks for setup again. In Codex, ask to run it with escalated permissions.
+- CLI: `node <skill>/scripts/diagram.mjs` (`help` lists commands). It prints the setup command when dependencies are missing.
 
 ## Pick a path
 

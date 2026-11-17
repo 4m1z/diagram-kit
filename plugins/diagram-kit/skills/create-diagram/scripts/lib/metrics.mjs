@@ -64,7 +64,8 @@ function pickName(font, key) {
 }
 
 export async function buildMetrics(fontPath, key) {
-  const { default: opentype } = await import('opentype.js');
+  const { dep } = await import('./deps.mjs');
+  const opentype = dep('opentype.js');
   const buf = readFileSync(fontPath);
   const font = opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
   const widths = {};

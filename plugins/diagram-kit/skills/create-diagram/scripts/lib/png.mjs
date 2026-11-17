@@ -1,8 +1,9 @@
 // PNG preview without a browser (works in sandboxes such as Codex's), via resvg.
 import { fileURLToPath } from 'node:url';
-import { Resvg } from '@resvg/resvg-js';
+import { dep } from './deps.mjs';
 import { renderSvg } from '../../assets/viewer/render.mjs';
 
+const { Resvg } = dep('@resvg/resvg-js');
 const FONTS = fileURLToPath(new URL('../../assets/fonts/', import.meta.url));
 const FILES = ['Geist-Regular.ttf', 'Geist-Medium.ttf', 'Geist-SemiBold.ttf', 'GeistMono-Regular.ttf', 'GeistMono-Medium.ttf'];
 
