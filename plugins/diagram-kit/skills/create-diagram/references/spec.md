@@ -1,6 +1,6 @@
 # Spec reference
 
-A spec is YAML (or JSON) that says what the diagram means. It never holds coordinates. `node <skill>/scripts/diagram.mjs example <kind>` prints a working example for each kind.
+A spec is YAML (or JSON) that says what the diagram means. It never holds coordinates. Inside `{ ... }` flow style, quote any value that contains a comma or a colon (`sub: "auth, rate limits"`), or YAML splits it. `node <skill>/scripts/diagram.mjs example <kind>` prints a working example for each kind.
 
 ## Common fields
 

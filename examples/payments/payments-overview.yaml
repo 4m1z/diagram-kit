@@ -21,7 +21,7 @@ nodes:
   - {id: ledger, label: Ledger, sub: double-entry, icon: book-open, group: core, about: Turns every money movement into balanced debit and credit entries., facts: [F6, D4]}
   - {id: vault, label: Card vault, sub: tokens, icon: lock, group: pci, tone: amber, about: Stores card numbers and hands out tokens; the only part that sees raw card data., facts: [F7, D1]}
   - {id: idem, label: Idempotency keys, sub: Redis, icon: key-round, group: data, facts: [F1]}
-  - {id: paydb, label: Payments DB, sub: Postgres · outbox, icon: database, group: data, about: Payment state and the outbox table, written in one transaction., facts: [F3, D2]}
+  - {id: paydb, label: Payments DB, sub: Postgres · outbox, icon: database, group: data, about: "Payment state and the outbox table, written in one transaction.", facts: [F3, D2]}
   - {id: ledgerdb, label: Ledger DB, sub: append-only, icon: database, group: data, facts: [F6]}
   - {id: acquirer, label: Acquirer, sub: card networks, icon: landmark, group: external, about: Authorizes card payments with the issuing bank and settles funds later., facts: [F2]}
   - {id: relay, label: Outbox relay, sub: CDC, icon: refresh-cw, group: events, about: Reads committed outbox rows from the write-ahead log and publishes them., facts: [F3, F5]}

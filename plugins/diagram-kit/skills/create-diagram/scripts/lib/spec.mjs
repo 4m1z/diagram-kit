@@ -106,7 +106,20 @@ function asList(value, what) {
   throw new SpecError(`"${what}" should be a list.`);
 }
 
-function element(item, i, what) {
+// Fields the engine reads. Anything else is almost always a typo, or a YAML flow mapping split by
+// an unquoted comma ({ sub: a, b } makes a key "b"), so it is reported instead of silently dropped.
+const KNOWN = {
+  element: ['id', 'label', 'sub', 'icon', 'group', 'tier', 'shape', 'tone', 'about', 'details', 'facts', 'sources', 'link', 'fields', 'layout', 'parent', 'children'],
+  edge: ['id', 'from', 'to', 'label', 'kind', 'about', 'details', 'facts', 'sources', 'link', 'main', 'back'],
+};
+function unknownKeys(o, known, what, id, warnings) {
+  const extra = Object.keys(o).filter((k) => !known.includes(k));
+  if (extra.length && warnings)
+    warnings.push({ level: 'warn', code: 'field', ids: [id], message: `${what} "${id}" has unknown field${extra.length > 1 ? 's' : ''} ${extra.map((k) => `"${k}"`).join(', ')}.`, hint: 'Check the spelling; in { ... } flow style, quote values that contain a comma or a colon.' });
+}
+
+function element(item, i, what, warnings) {
+  if (item && typeof item === 'object') unknownKeys(item, KNOWN.element, what, item.id ?? item.label ?? i + 1, warnings);
   const o = typeof item === 'string' ? { label: item } : { ...item };
   if (!o.id) o.id = o.label ? slug(o.label) : `${what}-${i + 1}`;
   o.id = String(o.id);
@@ -121,8 +134,8 @@ function normalizeGraph(raw, base, kind) {
   const direction = raw.direction ?? kind.direction;
   if (!DIRECTIONS.includes(direction)) throw new SpecError(`direction must be one of ${DIRECTIONS.join(', ')}.`);
   const tiers = (raw.tiers ?? []).map(String);
-  const groups = asList(raw.groups, 'groups').map((g, i) => element(g, i, 'group'));
-  const nodes = asList(raw.nodes, 'nodes').map((n, i) => element(n, i, 'node'));
+  const groups = asList(raw.groups, 'groups').map((g, i) => element(g, i, 'group', base.warnings));
+  const nodes = asList(raw.nodes, 'nodes').map((n, i) => element(n, i, 'node', base.warnings));
   const ids = new Map();
   for (const x of [...groups, ...nodes]) {
     if (ids.has(x.id)) throw new SpecError(`Duplicate id "${x.id}". Every node and group needs its own id.`);
@@ -148,6 +161,7 @@ function normalizeGraph(raw, base, kind) {
   const edgeIds = new Set();
   const edges = (raw.edges ?? []).map((e, i) => {
     if (!e || (typeof e !== 'string' && typeof e !== 'object')) throw new SpecError(`Edge ${i + 1} is empty.`);
+    if (typeof e === 'object') unknownKeys(e, KNOWN.edge, 'Edge', e.id ?? `${e.from} -> ${e.to}`, base.warnings);
     const edge = parseEdge(e);
     for (const end of ['from', 'to']) {
       const [nodeId, field] = String(edge[end]).split('.');
@@ -199,7 +213,7 @@ function normalizeFlows(rawFlows, edges) {
 }
 
 function normalizeSequence(raw, base) {
-  const participants = asList(raw.participants, 'participants').map((p, i) => element(p, i, 'participant'));
+  const participants = asList(raw.participants, 'participants').map((p, i) => element(p, i, 'participant', base.warnings));
   const ids = new Set(participants.map((p) => p.id));
   if (ids.size !== participants.length) throw new SpecError('Participant ids must be unique.');
   if (!participants.length) throw new SpecError('A sequence needs participants.');

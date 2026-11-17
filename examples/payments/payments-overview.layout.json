@@ -212,7 +212,7 @@
     "Postgres · outbox"
    ],
    "group": "data",
-   "about": "Payment state and the outbox table",
+   "about": "Payment state and the outbox table, written in one transaction.",
    "facts": [
     "F3",
     "D2"

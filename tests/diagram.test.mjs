@@ -206,3 +206,8 @@ test('a copy without node_modules points at setup instead of crashing', () => {
   }
   assert.match(out, /diagram\.mjs" setup/);
 });
+
+test('unknown fields are reported (a comma in a YAML flow value splits it)', () => {
+  const s = normalizeSpec({ nodes: [{ id: 'a', sub: 'measures', previews: null }] });
+  assert.ok(s.warnings.some((w) => w.code === 'field' && /previews/.test(w.message)));
+});
