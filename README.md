@@ -1,6 +1,6 @@
 # diagram-kit
 
-agents are bad at placing boxes. diagram-kit gives Claude Code and Codex a layout engine ([ELK.js](https://eclipse.dev/elk/)) and a skill, `create-diagram`, with the instructions and intuition to draw clear, well-positioned diagrams in whatever medium you work in.
+Agents are bad at placing boxes!:D diagram-kit gives Claude Code and Codex a layout engine ([ELK.js](https://eclipse.dev/elk/)) and a skill, `create-diagram`, with the instructions and intuition to draw clear, well-positioned diagrams in whatever medium you work in.
 
 <a href="https://alireza29675.github.io/diagram-kit/"><picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/index.dark.png">
