@@ -1,0 +1,146 @@
+/* Viewer chrome. Colours and fonts come from the --dk-* tokens (theme.mjs); restyle by overriding them. */
+.dk-root {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  background: var(--dk-bg);
+  color: var(--dk-text);
+  font-family: var(--dk-sans);
+  -webkit-font-smoothing: antialiased;
+}
+.dk-stage {
+  position: absolute;
+  inset: 0;
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+  background-image: radial-gradient(circle at 1px 1px, var(--dk-dot) 0.9px, transparent 0);
+}
+.dk-stage.is-dragging { cursor: grabbing; }
+.dk-stage svg { display: block; user-select: none; -webkit-user-select: none; }
+
+/* Header: title and one line, nothing more. */
+.dk-head {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  right: 180px;
+  pointer-events: none;
+}
+.dk-head h1 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.dk-head p { margin: 3px 0 0; font-size: 12.5px; color: var(--dk-muted); }
+.dk-draft { margin-left: 8px; padding: 1px 6px; border: 1px solid var(--dk-border-strong); border-radius: 5px; font: 500 10px/16px var(--dk-mono); color: var(--dk-muted); vertical-align: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Floating controls. */
+.dk-tools, .dk-flowbar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--dk-surface);
+  border: 1px solid var(--dk-border);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px var(--dk-shadow), 0 4px 16px -8px var(--dk-shadow);
+}
+.dk-tools { top: 14px; right: 14px; }
+.dk-flowbar { left: 14px; bottom: 14px; max-width: calc(100% - 28px); }
+.dk-root button {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--dk-muted);
+  cursor: pointer;
+}
+.dk-root button:hover { background: var(--dk-surface2); color: var(--dk-text); }
+.dk-root button:focus-visible, .dk-flowpick:focus-visible { outline: 2px solid var(--dk-accent); outline-offset: 1px; }
+.dk-play { color: var(--dk-text) !important; }
+.dk-flowname, .dk-flowpick {
+  font: 500 12.5px/1 var(--dk-sans);
+  color: var(--dk-text);
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.dk-flowpick { height: 28px; border: 0; background: transparent; cursor: pointer; }
+.dk-steptext {
+  font: 400 11.5px/1.2 var(--dk-mono);
+  color: var(--dk-muted);
+  padding: 0 8px;
+  min-width: 0;
+  max-width: 340px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-left: 1px solid var(--dk-border);
+}
+
+/* Inspector. */
+.dk-panel {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 320px;
+  max-height: calc(100% - 80px);
+  overflow: auto;
+  padding: 14px 16px 16px;
+  background: var(--dk-surface);
+  border: 1px solid var(--dk-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px var(--dk-shadow), 0 12px 32px -12px var(--dk-shadow);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.dk-panel[hidden] { display: none; }
+.dk-close { position: absolute; top: 8px; right: 8px; }
+.dk-panel h2 { margin: 0 28px 2px 0; font-size: 14px; font-weight: 600; }
+.dk-panel p { margin: 6px 0 0; color: var(--dk-text); }
+.dk-panel .dk-sub { margin: 0; font: 400 11.5px/1.4 var(--dk-mono); color: var(--dk-muted); }
+.dk-panel dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 10px 0 0; font: 400 11.5px/1.5 var(--dk-mono); }
+.dk-panel dt { color: var(--dk-muted); }
+.dk-panel dd { margin: 0; }
+.dk-facts { list-style: none; margin: 12px 0 0; padding: 10px 0 0; border-top: 1px solid var(--dk-border); display: grid; gap: 8px; }
+.dk-facts li { display: grid; grid-template-columns: auto 1fr; gap: 8px; font-size: 12.5px; color: var(--dk-text); }
+.dk-fid { font: 500 10.5px/1.9 var(--dk-mono); color: var(--dk-accent); }
+.dk-kind { display: inline-block; margin-right: 6px; padding: 0 5px; border: 1px solid var(--dk-border); border-radius: 4px; font: 500 10px/16px var(--dk-mono); color: var(--dk-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.dk-src { display: block; margin-top: 2px; font: 400 11px/1.4 var(--dk-mono); color: var(--dk-muted); word-break: break-word; }
+.dk-src a { color: var(--dk-muted); text-decoration: underline; text-decoration-color: var(--dk-border-strong); text-underline-offset: 2px; }
+.dk-src a:hover { color: var(--dk-text); }
+.dk-src code { font: inherit; }
+
+/* Diagram states. */
+.dk-node, .dk-edge, .dk-edge-label, .dk-group-label { cursor: pointer; }
+.dk-node[data-shape="note"] { cursor: default; }
+.dk-node, .dk-edge, .dk-edge-label, .dk-group, .dk-bar, .dk-lifeline { transition: opacity 160ms ease; }
+.dk-svg.dk-dim .dk-node, .dk-svg.dk-dim .dk-edge, .dk-svg.dk-dim .dk-edge-label, .dk-svg.dk-dim .dk-bar, .dk-svg.dk-dim .dk-lifeline { opacity: 0.2; }
+.dk-svg.dk-dim .dk-group, .dk-svg.dk-dim .dk-group-label { opacity: 0.55; }
+.dk-svg.dk-dim .is-lit { opacity: 1; }
+.dk-edge.is-lit .dk-line { stroke: var(--dk-edge-strong) !important; }
+.dk-edge.is-lit .dk-arrow { fill: var(--dk-edge-strong) !important; }
+.dk-edge.is-current .dk-line { stroke: var(--dk-accent) !important; stroke-width: 1.75px !important; }
+.dk-edge.is-current .dk-arrow { fill: var(--dk-accent) !important; }
+.dk-node.is-lit .dk-shape { stroke: var(--dk-border-strong) !important; }
+.dk-node.is-selected .dk-shape { stroke: var(--dk-accent) !important; }
+.dk-badge { transition: transform 160ms ease; transform-box: fill-box; transform-origin: center; }
+.dk-badge.is-current { transform: scale(1.18); }
+.dk-packet { fill: var(--dk-accent); filter: drop-shadow(0 0 5px var(--dk-accent)); }
+.dk-packet.is-done { transition: opacity 400ms ease; opacity: 0; }
+
+@media (max-width: 640px) {
+  .dk-head { top: 14px; left: 16px; right: 140px; }
+  .dk-tools { top: 10px; right: 10px; }
+  .dk-flowbar { left: 10px; right: 10px; bottom: 10px; }
+  .dk-steptext { flex: 1; max-width: none; }
+  .dk-panel { left: 10px; right: 10px; bottom: 10px; width: auto; max-height: 55%; }
+  .dk-root:has(.dk-flowbar) .dk-panel { bottom: 58px; }
+  .is-playing .dk-panel { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dk-node, .dk-edge, .dk-edge-label, .dk-group, .dk-badge { transition: none; }
+}
