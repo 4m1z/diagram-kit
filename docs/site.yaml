@@ -1,0 +1,43 @@
+# The GitHub Pages site. Rebuild: node ../plugins/diagram-kit/skills/create-diagram/scripts/diagram.mjs page site.yaml
+title: diagram-kit
+tagline: Agents are bad at placing boxes. diagram-kit gives Claude Code and Codex a layout engine (ELK.js) and a skill with the instructions and intuition to draw clear, well-positioned diagrams in whatever medium you work in.
+repo: https://github.com/Alireza29675/diagram-kit
+sections:
+  - heading: How it works
+  - spec: how-it-works.yaml
+    title: false
+  - heading: Install the plugin
+    text: 'Then ask your agent for a diagram using `/create-diagram explain what you want`'
+    install: true
+  - heading: What agents could one-shot with diagram-kit 👇
+  - spec: ../plugins/diagram-kit/skills/create-diagram/examples/architecture.yaml
+    title: Architecture
+  - spec: ../plugins/diagram-kit/skills/create-diagram/examples/flowchart.yaml
+    title: Flowchart
+  - spec: ../plugins/diagram-kit/skills/create-diagram/examples/sequence.yaml
+    title: Sequence
+  - spec: ../plugins/diagram-kit/skills/create-diagram/examples/state.yaml
+    title: State machine
+  - spec: ../plugins/diagram-kit/skills/create-diagram/examples/datamodel.yaml
+    title: Data model
+  - spec: ../plugins/diagram-kit/skills/create-diagram/examples/tree.yaml
+    title: Tree
+  - spec: ../plugins/diagram-kit/skills/create-diagram/examples/mindmap.yaml
+    title: Mind map
+  - spec: ../examples/payments/payments-overview.yaml
+    title: A harder one, card payments
+  - spec: ../examples/payments/payments-saga.yaml
+    continues: true
+  - iframe: 3d/index.html
+    title: whatever medium..!
+    text: diagram-kit gives your agent a programmatic view of the layout, the structure and how everything connects. What it does with that is up to your agent, even a racing game.
+    ratio: 1.6
+install:
+  - label: Claude Code
+    code: |
+      /plugin marketplace add Alireza29675/diagram-kit
+      /plugin install diagram-kit@diagram-kit
+  - label: Codex
+    code: |
+      codex plugin marketplace add Alireza29675/diagram-kit
+      codex plugin add diagram-kit@diagram-kit
