@@ -1,0 +1,19 @@
+# Data model: tables with fields; relationships attach to the exact field rows.
+kind: datamodel
+title: Orders schema
+nodes:
+  - id: customers
+    label: customers
+    icon: users
+    fields: ["id uuid pk", "email text", "created_at timestamptz"]
+  - id: orders
+    label: orders
+    icon: receipt
+    fields: ["id uuid pk", "customer_id uuid fk", "status text", "total_cents bigint"]
+  - id: items
+    label: order_items
+    icon: list
+    fields: ["id uuid pk", "order_id uuid fk", "sku text", "qty int"]
+edges:
+  - orders.customer_id -> customers.id
+  - items.order_id -> orders.id

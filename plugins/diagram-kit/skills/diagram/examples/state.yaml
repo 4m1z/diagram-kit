@@ -1,0 +1,21 @@
+# States and transitions: small start and end markers, labelled transitions.
+kind: state
+title: Payment intent
+nodes:
+  - {id: start, label: "", shape: start}
+  - {id: created, label: Created}
+  - {id: auth, label: Authorized}
+  - {id: captured, label: Captured, tone: green}
+  - {id: failed, label: Failed, tone: red}
+  - {id: refunded, label: Refunded}
+  - {id: end, label: "", shape: end}
+edges:
+  - start -> created
+  - "created -> auth: authorize"
+  - "created -> failed: declined"
+  - "auth -> captured: capture"
+  - "auth -> failed: expired"
+  - "captured -> refunded: refund"
+  - captured -> end
+  - refunded -> end
+  - failed -> end

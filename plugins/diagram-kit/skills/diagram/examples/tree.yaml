@@ -1,0 +1,17 @@
+# Hierarchy: nested children, orthogonal branches.
+kind: tree
+title: Monorepo
+direction: right
+root:
+  label: repo
+  icon: folder-git-2
+  children:
+    - label: apps
+      icon: folder
+      children: [{label: web, sub: Next.js}, {label: api, sub: Hono}]
+    - label: packages
+      icon: folder
+      children: [{label: ui}, {label: db, sub: Drizzle}, {label: config}]
+    - label: infra
+      icon: folder
+      children: [{label: terraform}]

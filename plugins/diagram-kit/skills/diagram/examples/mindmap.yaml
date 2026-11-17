@@ -1,0 +1,14 @@
+# Ideas around a centre: branches balance left and right.
+kind: mindmap
+title: Launch plan
+root:
+  label: v1 launch
+  children:
+    - label: Product
+      children: [{label: Onboarding}, {label: Pricing page}, {label: Docs}]
+    - label: Growth
+      children: [{label: Changelog}, {label: Launch post}]
+    - label: Reliability
+      children: [{label: Status page}, {label: Alerts}, {label: Backups}]
+    - label: Support
+      children: [{label: Help center}]

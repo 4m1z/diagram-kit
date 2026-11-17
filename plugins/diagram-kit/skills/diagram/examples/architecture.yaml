@@ -1,0 +1,25 @@
+# System design: tiers become columns, groups become boxes, declaration order is kept.
+kind: architecture
+title: URL shortener
+subtitle: Redirect path
+tiers: [client, edge, app, data]
+groups:
+  - {id: app, label: App, tier: app}
+  - {id: data, label: Data, tier: data}
+nodes:
+  - {id: browser, label: Browser, icon: app-window, tier: client}
+  - {id: cdn, label: CDN, icon: globe, tier: edge, about: Caches 301s for popular links.}
+  - {id: api, label: Redirect API, sub: Go, icon: server, group: app}
+  - {id: writer, label: Shorten API, sub: Go, icon: server, group: app}
+  - {id: cache, label: Hot links, sub: Redis, icon: zap, group: data}
+  - {id: db, label: Links, sub: Postgres, icon: database, group: data}
+edges:
+  - "browser -> cdn: GET /abc"
+  - "cdn -> api: miss"
+  - "api ..> cache: lookup"
+  - "api ..> db: fallback"
+  - "browser -> writer: POST /links"
+  - "writer ..> db: insert"
+flows:
+  - label: Follow a link
+    steps: ["browser -> cdn", "cdn -> api", "api ..> cache", "api ..> db"]

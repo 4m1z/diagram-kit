@@ -1,0 +1,22 @@
+# Process: direction down, decisions as diamonds, start and end as pills.
+kind: flowchart
+title: Deploy gate
+nodes:
+  - {id: push, label: Push to main, shape: pill}
+  - {id: ci, label: Run tests, icon: flask-conical}
+  - {id: green, label: All green?, shape: diamond}
+  - {id: stage, label: Deploy to staging, icon: rocket}
+  - {id: smoke, label: Smoke checks pass?, shape: diamond}
+  - {id: prod, label: Promote to production, icon: rocket, tone: accent}
+  - {id: fix, label: Notify the author, icon: bell}
+  - {id: done, label: Done, shape: pill}
+edges:
+  - push -> ci
+  - ci -> green
+  - "green -> stage: yes"
+  - "green -> fix: no"
+  - stage -> smoke
+  - "smoke -> prod: yes"
+  - "smoke -> fix: no"
+  - prod -> done
+  - fix -> done

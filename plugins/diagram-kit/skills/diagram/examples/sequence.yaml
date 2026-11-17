@@ -1,0 +1,26 @@
+# Interactions over time: participants in reading order, blocks for alternatives and loops.
+kind: sequence
+title: Sign in with a passkey
+participants:
+  - {id: user, label: User, icon: user}
+  - {id: app, label: Web app, icon: app-window}
+  - {id: auth, label: Auth API, icon: key-round}
+  - {id: db, label: Users DB, icon: database}
+messages:
+  - "user -> app: Sign in"
+  - "app -> auth: begin(challenge)"
+  - "auth --> app: options"
+  - "app -> user: Touch ID prompt"
+  - "user --> app: signed assertion"
+  - "app -> auth: verify(assertion)"
+  - "auth ..> db: load credential"
+  - block: alt
+    label: signature valid
+    messages:
+      - "auth --> app: session cookie"
+    else:
+      - label: invalid
+        messages:
+          - "auth --> app: 401"
+  - note: The private key never leaves the device.
+    over: [user]
