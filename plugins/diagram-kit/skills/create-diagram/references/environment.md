@@ -19,9 +19,9 @@ Decide this first; it changes the output, not the spec.
 
 ## Working in the user's medium
 
-1. Plan with the kit first: spec, build, check, look, exactly as for a standalone page. This is where the positions and routes get good.
+1. Plan with the kit first: spec, variants, build, check, look, exactly as for a standalone page. The checked `layout.json` and its PNG are the reference: what sits beside what, in which order, in which group, along which path, and how big. `--spacing <factor>` gives more room when that is all the medium needs.
 2. Read their environment: how they already draw (components, canvas or SVG code, a diagram library, a docs format), their styles and tokens, their folder conventions.
-3. Reproduce the result there: take every position, size and wire route from `layout.json` and draw it with their primitives and style. Keep the spec next to it so the diagram can be rebuilt.
+3. Adapt, do not copy: the reference is a role model, not a contract. Keep its structure (reading order, rows and columns, groups, every connection, the main path) and choose positions, spacing, sizes and routing that suit the medium. Compressing columns into an even grid, giving a 3D world room to move through, or routing wires as roads between rows are all fine; reversing the reading order, splitting a group or dropping a connection is not. Keep the spec next to the result so the diagram can be rebuilt.
 4. Fit check: if it fits what exists, integrate it. If it would need a new dependency, a new component pattern, a style change or a structural change, describe the change, recommend one option and ask before touching anything. Never restyle or restructure their environment to suit the diagram.
 5. Language, tone and detail follow the user and the medium: details go only where the medium has a natural place for them.
 
@@ -40,7 +40,34 @@ Decide this first; it changes the output, not the spec.
 | Claude Code with the Artifact tool | Publish `<name>.html` as an artifact. It already follows the artifact page contract: tokens on `:root`, dark mode by media query and `data-theme`, an explicit body background, no external requests. |
 | A React app with nothing of its own for diagrams | `build <spec> --react src/diagrams/<name>` writes `Diagram.tsx` (a client component), `diagram-viewer.js`, `diagram.css` (tokens scoped to `.dk-root`, Geist via `fonts/`), `<name>.layout.json` and a usage example. Import the JSON and render `<Diagram model={model} />`. Next.js Pages Router: import `diagram.css` from `pages/_app` instead. |
 | Markdown, slides, chat, a PR | `<name>.png` (light) and `--dark` for `<name>.dark.png`. Link the HTML for the interactive version. |
-| The user's own medium | `<name>.layout.json` is the contract: every node, group and wire with its final coordinates and routes. Redraw it with their primitives (see Working in the user's medium). |
+| The user's own medium | `<name>.layout.json` and its PNG are the reference: every node, group and wire with coordinates and routes. Rebuild it with their primitives, adapted to the medium (see Working in the user's medium). |
+
+## Several views on one page
+
+`node <skill>/scripts/diagram.mjs page page.yaml [--out index.html]` builds one page holding several diagrams, each interactive, scrolling like a normal page:
+
+```yaml
+title: Payments
+tagline: How a card payment moves through the system.   # optional
+repo: https://github.com/org/repo                        # optional: a prominent link
+sections:
+  - spec: payments-overview.yaml
+    hero: true                      # first and largest, no heading
+  - spec: payments-saga.yaml
+    title: Card authorization       # the section's heading; defaults to the diagram's title, false for none
+    maxHeight: 1100                 # optional: let a tall diagram grow past the default 720px
+    text: The saga behind step 4.   # one line
+    showSpec: true                  # show the YAML under the diagram
+  - spec: payments-refund.yaml
+    continues: true                 # same section as the one above
+  - heading: Install                # a big divider heading, with an optional line
+    install: true                   # place the manifest's install blocks here
+  - iframe: 3d/index.html           # embed another page of the site (relative path or https)
+    title: In 3D
+    ratio: 1.6
+install:
+  - { label: Claude Code, code: "/plugin install ..." }
+```
 
 ## The interactive page
 

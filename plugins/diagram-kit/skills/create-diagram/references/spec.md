@@ -12,7 +12,8 @@ brief: ./payments-brief.md           # optional; enables fact links and the appr
 numbered: true            # number the primary flow's steps on the picture (default true)
 theme:                    # optional token overrides, see design.md
   light: { accent: '#0070f3' }
-layout: { elk.spacing.nodeNode: 32 }  # optional raw ELK options (graph kinds), see layout.md
+layout: { spacing: 1.5 }      # optional layout settings (graph kinds): the lines `variants` prints, spacing, raw ELK options; see layout.md
+                              # sameSize: true gives every box one size; [a, b, c] evens out just those; [[a, b], [c, d]] makes two sets
 ```
 
 Every part, group, wire and message may carry explanation fields. They are hidden until someone clicks it:
@@ -44,6 +45,8 @@ tiers: [clients, edge, core, data, external]   # columns in reading order (optio
 groups:
   - { id: core, label: Payment core, tier: core }
   - { id: pci, label: PCI zone, parent: core, tone: amber }   # nested group
+  - { id: steps, label: Pipeline, direction: right }   # its parts run across a top-to-bottom picture (holds parts only)
+  - { id: engines, label: Layout engines, icon: sigma, tone: blue }   # with an icon: drawn as a part holding smaller parts in a row (holds parts only)
 nodes:
   - id: api                 # required for anything wires point at
     label: Payments API     # 1 to 3 words
@@ -61,6 +64,7 @@ edges:
   - "a -- b"                                  # plain link
   - { from: api, to: risk, label: score, kind: sync, main: true, about: ..., facts: [F4] }
   - { from: webhooks, to: merchant, label: event, kind: async, back: true }   # an intended callback
+  - "user -> steps: run"                      # a wire may point at a whole group; it ends on the group's border
 flows:
   - label: Card payment     # the first flow is primary: its steps get numbers on the picture
     steps:
@@ -72,6 +76,7 @@ flows:
 - Several wires between the same two parts get ids `a->b`, `a->b#2`, ... Flow steps can use those ids.
 - `main: true` on a wire, or being in the primary flow, keeps it straight.
 - `back: true` marks an intended callback (a webhook or push to the caller): the layout lets it run backwards and the check does not flag it.
+- A `back: true` wire between parts of the same group is a loop (a retry, "something wrong, go back"): it runs along the side, so the main line stays straight, and several loops into one part share one return line. Mark the main line `main: true` so the loop, not a main step, is the one that runs backwards.
 
 ### Tables (datamodel)
 

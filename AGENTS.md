@@ -9,8 +9,8 @@ plugins/diagram-kit/skills/create-diagram/
   SKILL.md              the workflow agents follow
   references/           brief, spec, kinds, layout, design, environment, checklist
   examples/             one small spec per kind (`diagram example <kind>` prints them)
-  scripts/diagram.mjs   CLI: build, check, png, react, metrics, example
-  scripts/lib/          spec -> layout (ELK, sequence, mindmap) -> model -> check, png, html
+  scripts/diagram.mjs   CLI: variants, build, check, png, react, page, metrics, example
+  scripts/lib/          spec -> layout (ELK, sequence, mindmap) -> model -> check, png, html; variants.mjs explores layouts
   assets/viewer/        theme tokens, the SVG renderer and the viewer (browser-safe, shared)
   assets/               fonts, Lucide icons, font metrics, licences
 plugins/diagram-kit/.claude-plugin, .codex-plugin   plugin manifests (names and versions agree with plugins/diagram-kit/package.json)
@@ -18,7 +18,8 @@ plugins/diagram-kit/skills/create-diagram/agents/openai.yaml   Codex display met
 .claude-plugin/, .agents/plugins/                   marketplaces
 .agents/skills/create-diagram -> the skill (and .claude/skills -> .agents/skills) for dogfooding here
 examples/payments/      the showcase: brief, specs and built outputs
-docs/                   GitHub Pages: the how-it-works diagram (spec how-it-works.yaml, built index.html and the README images)
+docs/                   GitHub Pages: site.yaml lists the sections; `diagram.mjs page site.yaml` builds index.html; how-it-works.png is the README picture;
+                        3d/ is a toy racing game that adapts payments.layout.json to a drivable town (keeps rows, columns, groups and connections; its own spacing and roads; three.js r187 vendored). Preview locally over http (modules do not load from file://): `python3 -m http.server --bind 127.0.0.1 --directory docs`
 tests/                  node:test suites
 ```
 
