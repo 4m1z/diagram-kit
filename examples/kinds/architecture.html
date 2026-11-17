@@ -37,6 +37,7 @@ html, body { margin: 0; height: 100%; background: var(--dk-bg); }
   background-image: radial-gradient(circle at 1px 1px, var(--dk-dot) 0.9px, transparent 0);
 }
 .dk-stage.is-dragging { cursor: grabbing; }
+.dk-embedded .dk-stage { touch-action: pan-y pinch-zoom; }
 .dk-stage svg { display: block; user-select: none; -webkit-user-select: none; }
 
 /* Header: title and one line, nothing more. */
@@ -135,6 +136,8 @@ html, body { margin: 0; height: 100%; background: var(--dk-bg); }
 /* Diagram states. */
 .dk-node, .dk-edge, .dk-edge-label, .dk-group-label { cursor: pointer; }
 .dk-node[data-shape="note"] { cursor: default; }
+.dk-link .dk-icon { transition: stroke 120ms ease; }
+.dk-link:hover .dk-icon, .dk-link:focus-visible .dk-icon { stroke: var(--dk-accent); }
 .dk-node, .dk-edge, .dk-edge-label, .dk-group, .dk-bar, .dk-lifeline { transition: opacity 160ms ease; }
 .dk-svg.dk-dim .dk-node, .dk-svg.dk-dim .dk-edge, .dk-svg.dk-dim .dk-edge-label, .dk-svg.dk-dim .dk-bar, .dk-svg.dk-dim .dk-lifeline { opacity: 0.2; }
 .dk-svg.dk-dim .dk-group, .dk-svg.dk-dim .dk-group-label { opacity: 0.55; }
@@ -167,7 +170,7 @@ html, body { margin: 0; height: 100%; background: var(--dk-bg); }
 </head>
 <body>
 <div id="diagram"></div>
-<script type="application/json" id="diagram-model">{"version":1,"kind":"architecture","engine":"graph","title":"URL shortener","subtitle":"Redirect path","direction":"right","numbered":true,"theme":{},"nodes":[{"id":"browser","label":"Browser","icon":"app-window","shape":"box","x":32,"y":160.33333333333331,"w":108,"h":40,"lines":["Browser"],"subLines":[]},{"id":"cdn","label":"CDN","icon":"globe","shape":"box","x":321,"y":153.66666666666666,"w":92,"h":40,"lines":["CDN"],"subLines":[],"about":"Caches 301s for popular links."},{"id":"api","label":"Redirect API","sub":"Go","icon":"server","shape":"box","x":592,"y":145.66666666666666,"w":132,"h":56,"lines":["Redirect API"],"subLines":["Go"],"group":"app"},{"id":"writer","label":"Shorten API","sub":"Go","icon":"server","shape":"box","x":594,"y":221.66666666666666,"w":128,"h":56,"lines":["Shorten API"],"subLines":["Go"],"group":"app"},{"id":"cache","label":"Hot links","sub":"Redis","icon":"zap","shape":"box","x":951,"y":120,"w":112,"h":56,"lines":["Hot links"],"subLines":["Redis"],"group":"data"},{"id":"db","label":"Links","sub":"Postgres","icon":"database","shape":"box","x":951,"y":196,"w":108,"h":56,"lines":["Links"],"subLines":["Postgres"],"group":"data"}],"groups":[{"id":"app","label":"App","x":574,"y":105.66666666666666,"w":168,"h":190,"depth":0},{"id":"data","label":"Data","x":933,"y":80,"w":148,"h":190,"depth":0}],"edges":[{"id":"browser->cdn","from":"browser","to":"cdn","kind":"sync","label":"GET /abc","points":[[140,173.66666666666666],[321,173.66666666666669]],"labelBox":{"x":200,"y":152.66666666666666,"w":61,"h":16},"badges":[{"flow":"follow-a-link","step":1,"x":189,"y":160.66666666666666}]},{"id":"cdn->api","from":"cdn","to":"api","kind":"sync","label":"miss","points":[[413,173.66666666666669],[592,173.66666666666666]],"labelBox":{"x":473,"y":152.66666666666666,"w":36,"h":16},"badges":[{"flow":"follow-a-link","step":2,"x":462,"y":160.66666666666666}]},{"id":"api->cache","from":"api","to":"cache","kind":"data","label":"lookup","points":[[724,164.33333333333331],[765,164.33333333333331],[765,156.66666666666666],[886,156.66666666666666],[886,148],[951,148]],"labelBox":{"x":813.5,"y":161.66666666666666,"w":48,"h":16},"badges":[{"flow":"follow-a-link","step":3,"x":802.5,"y":169.66666666666666}]},{"id":"api->db","from":"api","to":"db","kind":"data","label":"fallback","points":[[724,183],[765,182.99999999999997],[765,190.66666666666666],[886,190.66666666666666],[886,214.66666666666666],[951,214.66666666666666]],"labelBox":{"x":807,"y":195.66666666666669,"w":61,"h":16},"badges":[{"flow":"follow-a-link","step":4,"x":796,"y":203.66666666666669}]},{"id":"browser->writer","from":"browser","to":"writer","kind":"sync","label":"POST /links","points":[[140,187],[158,187],[158,234.66666666666669],[527,234.66666666666669],[527,249.66666666666669],[594,249.66666666666663]],"labelBox":{"x":327,"y":239.66666666666669,"w":80,"h":16}},{"id":"writer->db","from":"writer","to":"db","kind":"data","label":"insert","points":[[722,249.66666666666666],[886,249.66666666666666],[886,233.33333333333331],[951,233.33333333333331]],"labelBox":{"x":813.5,"y":254.66666666666669,"w":48,"h":16}}],"lines":[],"bars":[],"flows":[{"id":"follow-a-link","label":"Follow a link","primary":true,"steps":[{"edge":"browser->cdn","text":"GET /abc"},{"edge":"cdn->api","text":"miss"},{"edge":"api->cache","text":"lookup"},{"edge":"api->db","text":"fallback"}]}],"brief":null,"facts":{},"draft":false,"requireSources":false,"icons":{"app-window":[["rect",{"x":"2","y":"4","width":"20","height":"16","rx":"2"}],["path",{"d":"M10 4v4"}],["path",{"d":"M2 8h20"}],["path",{"d":"M6 4v4"}]],"globe":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"}],["path",{"d":"M2 12h20"}]],"server":[["rect",{"width":"20","height":"8","x":"2","y":"2","rx":"2","ry":"2"}],["rect",{"width":"20","height":"8","x":"2","y":"14","rx":"2","ry":"2"}],["line",{"x1":"6","x2":"6.01","y1":"6","y2":"6"}],["line",{"x1":"6","x2":"6.01","y1":"18","y2":"18"}]],"zap":[["path",{"d":"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"}]],"database":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 5V19A9 3 0 0 0 21 19V5"}],["path",{"d":"M3 12A9 3 0 0 0 21 12"}]]},"width":1113,"height":328}</script>
+<script type="application/json" id="diagram-model">{"version":1,"kind":"architecture","engine":"graph","title":"URL shortener","subtitle":"Redirect path","direction":"right","numbered":true,"theme":{},"nodes":[{"id":"browser","label":"Browser","icon":"app-window","shape":"box","x":32,"y":163.33333333333331,"w":108,"h":40,"lines":["Browser"],"subLines":[]},{"id":"cdn","label":"CDN","icon":"globe","shape":"box","x":321,"y":156.66666666666666,"w":92,"h":40,"lines":["CDN"],"subLines":[],"about":"Caches 301s for popular links."},{"id":"api","label":"Redirect API","sub":"Go","icon":"server","shape":"box","x":593,"y":148.66666666666666,"w":132,"h":56,"lines":["Redirect API"],"subLines":["Go"],"group":"app"},{"id":"writer","label":"Shorten API","sub":"Go","icon":"server","shape":"box","x":595,"y":230.66666666666666,"w":128,"h":56,"lines":["Shorten API"],"subLines":["Go"],"group":"app"},{"id":"cache","label":"Hot links","sub":"Redis","icon":"zap","shape":"box","x":954,"y":120,"w":112,"h":56,"lines":["Hot links"],"subLines":["Redis"],"group":"data"},{"id":"db","label":"Links","sub":"Postgres","icon":"database","shape":"box","x":954,"y":202,"w":108,"h":56,"lines":["Links"],"subLines":["Postgres"],"group":"data"}],"groups":[{"id":"app","label":"App","x":575,"y":108.66666666666666,"w":168,"h":196,"depth":0},{"id":"data","label":"Data","x":936,"y":80,"w":148,"h":196,"depth":0}],"edges":[{"id":"browser->cdn","from":"browser","to":"cdn","kind":"sync","label":"GET /abc","points":[[140,176.66666666666666],[321,176.66666666666669]],"labelBox":{"x":200,"y":155.66666666666666,"w":61,"h":16},"badges":[{"flow":"follow-a-link","step":1,"x":189,"y":163.66666666666666}]},{"id":"cdn->api","from":"cdn","to":"api","kind":"sync","label":"miss","points":[[413,176.66666666666669],[593,176.66666666666666]],"labelBox":{"x":473,"y":155.66666666666666,"w":36,"h":16},"badges":[{"flow":"follow-a-link","step":2,"x":462,"y":163.66666666666666}]},{"id":"api->cache","from":"api","to":"cache","kind":"data","label":"lookup","points":[[725,167.33333333333331],[767,167.33333333333331],[767,159.66666666666666],[888,159.66666666666666],[888,148],[954,148]],"labelBox":{"x":815.5,"y":164.66666666666666,"w":48,"h":16},"badges":[{"flow":"follow-a-link","step":3,"x":804.5,"y":172.66666666666666}]},{"id":"api->db","from":"api","to":"db","kind":"data","label":"fallback","points":[[725,186],[767,185.99999999999997],[767,193.66666666666666],[888,193.66666666666666],[888,220.66666666666666],[954,220.66666666666666]],"labelBox":{"x":809,"y":198.66666666666669,"w":61,"h":16},"badges":[{"flow":"follow-a-link","step":4,"x":798,"y":206.66666666666669}]},{"id":"browser->writer","from":"browser","to":"writer","kind":"sync","label":"POST /links","points":[[140,190],[158,190],[158,240.66666666666669],[527,240.66666666666669],[527,258.6666666666667],[595,258.66666666666663]],"labelBox":{"x":327,"y":245.66666666666669,"w":80,"h":16}},{"id":"writer->db","from":"writer","to":"db","kind":"data","label":"insert","points":[[723,258.66666666666663],[888,258.66666666666663],[888,239.33333333333331],[954,239.33333333333331]],"labelBox":{"x":815.5,"y":263.6666666666667,"w":48,"h":16}}],"lines":[],"bars":[],"flows":[{"id":"follow-a-link","label":"Follow a link","primary":true,"steps":[{"edge":"browser->cdn","text":"GET /abc"},{"edge":"cdn->api","text":"miss"},{"edge":"api->cache","text":"lookup"},{"edge":"api->db","text":"fallback"}]}],"brief":null,"facts":{},"draft":false,"requireSources":false,"icons":{"app-window":[["rect",{"x":"2","y":"4","width":"20","height":"16","rx":"2"}],["path",{"d":"M10 4v4"}],["path",{"d":"M2 8h20"}],["path",{"d":"M6 4v4"}]],"globe":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"}],["path",{"d":"M2 12h20"}]],"server":[["rect",{"width":"20","height":"8","x":"2","y":"2","rx":"2","ry":"2"}],["rect",{"width":"20","height":"8","x":"2","y":"14","rx":"2","ry":"2"}],["line",{"x1":"6","x2":"6.01","y1":"6","y2":"6"}],["line",{"x1":"6","x2":"6.01","y1":"18","y2":"18"}]],"zap":[["path",{"d":"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"}]],"database":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 5V19A9 3 0 0 0 21 19V5"}],["path",{"d":"M3 12A9 3 0 0 0 21 12"}]]},"width":1116,"height":337}</script>
 <script type="module">
 // Design tokens. Every colour, font and size the renderer and viewer use comes from here.
 // Override any of them per diagram (spec `theme:`) or per host project (`--tokens file.json`).
@@ -248,6 +251,9 @@ const sizes = {
   subtitle: 12.5,
   radius: 8,
   groupRadius: 12,
+  linkIcon: 11, // the arrow in the corner of a part with a link
+  linkInset: 6,
+  containerHead: 40, // the name row of a group drawn as a part (a group with an icon)
   corner: 7,
   stroke: 1,
   edgeStroke: 1.25,
@@ -311,7 +317,7 @@ const EDGE_KINDS = {
   weak: { dash: null, color: 'edge' },
 };
 
-function createPaint({ mode = 'vars', theme = 'light', over = {}, families = {} } = {}) {
+function createPaint({ mode = 'vars', theme = 'light', over = {}, families = {}, idPrefix = 'dk' } = {}) {
   const t = { ...tokens[theme], ...(over[theme] ?? {}) };
   const color = (name) => (mode === 'vars' ? `var(${cssVar(name)})` : (t[name] ?? name));
   // One attribute string per element. Vars mode packs everything into `style` so var() works.
@@ -339,7 +345,9 @@ function createPaint({ mode = 'vars', theme = 'light', over = {}, families = {} 
     if (css.length) out.push(`style="${esc(css.join(';'))}"`);
     return out.join(' ');
   };
-  return { mode, theme, color, attrs, tokens: t };
+  // SVG ids are prefixed per diagram so several diagrams can share one page.
+  const ref = (name) => `url(#${idPrefix}-${name})`;
+  return { mode, theme, color, attrs, tokens: t, ref, idPrefix };
 }
 
 // Orthogonal polyline with rounded corners, shortened at the end to leave room for the arrow.
@@ -426,7 +434,7 @@ function nodeSvg(model, n, p) {
     case 'diamond': {
       const cx = n.x + n.w / 2;
       const cy = n.y + n.h / 2;
-      parts.push(`<path d="M${n1(cx)},${n1(n.y)} L${n1(n.x + n.w)},${n1(cy)} L${n1(cx)},${n1(n.y + n.h)} L${n1(n.x)},${n1(cy)} Z" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="url(#dk-shadow)"/>`);
+      parts.push(`<path d="M${n1(cx)},${n1(n.y)} L${n1(n.x + n.w)},${n1(cy)} L${n1(cx)},${n1(n.y + n.h)} L${n1(n.x)},${n1(cy)} Z" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="${p.ref('shadow')}"/>`);
       parts.push(centeredText());
       break;
     }
@@ -448,7 +456,7 @@ function nodeSvg(model, n, p) {
     }
     case 'table': {
       const H = S.tableHeader;
-      parts.push(`<rect x="${n1(n.x)}" y="${n1(n.y)}" width="${n1(n.w)}" height="${n1(n.h)}" rx="${S.radius}" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="url(#dk-shadow)"/>`);
+      parts.push(`<rect x="${n1(n.x)}" y="${n1(n.y)}" width="${n1(n.w)}" height="${n1(n.h)}" rx="${S.radius}" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="${p.ref('shadow')}"/>`);
       parts.push(`<path d="M${n1(n.x)},${n1(n.y + H)} H${n1(n.x + n.w)}" ${p.attrs({ stroke: 'border', sw: S.stroke })}/>`);
       let tx = n.x + 12;
       if (n.icon) {
@@ -471,7 +479,7 @@ function nodeSvg(model, n, p) {
     }
     default: {
       const rx = n.shape === 'pill' ? n.h / 2 : S.radius;
-      parts.push(`<rect x="${n1(n.x)}" y="${n1(n.y)}" width="${n1(n.w)}" height="${n1(n.h)}" rx="${n1(rx)}" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="url(#dk-shadow)"/>`);
+      parts.push(`<rect x="${n1(n.x)}" y="${n1(n.y)}" width="${n1(n.w)}" height="${n1(n.h)}" rx="${n1(rx)}" ${p.attrs({ fill: 'surface', stroke, sw: S.stroke })} class="dk-shape" filter="${p.ref('shadow')}"/>`);
       if (n.icon) {
         const ix = n.x + S.padX;
         parts.push(iconSvg(model, n.icon, ix, n.y + n.h / 2 - S.icon / 2, S.icon, p, toneColor ?? 'muted'));
@@ -481,7 +489,23 @@ function nodeSvg(model, n, p) {
       } else parts.push(centeredText());
     }
   }
+  if (safeLink(n.link) && model.icons?.[LINK_ICON]) parts.push(linkSvg(model, n, p));
   return `<g class="dk-node" data-id="${esc(n.id)}" data-shape="${esc(n.shape ?? 'box')}">${parts.join('')}</g>`;
+}
+
+// A part with a link gets a very small arrow in its top-right corner that opens the link in a new
+// tab (the viewer lets clicks on links through instead of selecting the part).
+const LINK_ICON = 'arrow-up-right';
+const safeLink = (url) => typeof url === 'string' && /^https?:\/\/[^\s"'<>]+$/i.test(url);
+function linkSvg(model, n, p) {
+  const S = sizes;
+  const x = n.x + n.w - S.linkIcon - S.linkInset;
+  const y = n.y + S.linkInset;
+  const pad = 4;
+  return `<a class="dk-link" href="${esc(n.link)}" target="_blank" rel="noopener noreferrer"><title>${esc(n.link)}</title>` +
+    `<rect x="${n1(x - pad)}" y="${n1(y - pad)}" width="${n1(S.linkIcon + 2 * pad)}" height="${n1(S.linkIcon + 2 * pad)}" rx="4" ${p.attrs({ fill: 'surface', opacity: 0 })}/>` +
+    iconSvg(model, LINK_ICON, x, y, S.linkIcon, p, 'muted') +
+    `</a>`;
 }
 
 function groupSvg(g, p) {
@@ -495,14 +519,28 @@ function groupSvg(g, p) {
       (g.label ? `<rect x="${n1(g.x + tagW + 4)}" y="${n1(g.y + 3)}" width="${n1(g.labelW ?? 0)}" height="14" rx="3" ${p.attrs({ fill: 'bg', opacity: 0.92 })}/><text x="${n1(g.x + tagW + 8)}" y="${n1(baseline(g.y + 10, S.edge))}" ${p.attrs({ fill: 'muted', font: ['mono', 400, S.edge] })}>${esc(g.label)}</text>` : '') +
       `</g>`;
   }
+  // A group with an icon is a part that holds smaller parts: drawn like a part, its name on top.
+  if (g.icon) {
+    return `<g class="dk-group dk-container" data-id="${esc(g.id)}">` +
+      `<rect x="${n1(g.x)}" y="${n1(g.y)}" width="${n1(g.w)}" height="${n1(g.h)}" rx="${S.radius}" ${p.attrs({ fill: 'surface', stroke: g.tone === 'accent' ? 'accent' : 'border', sw: S.stroke })} filter="${p.ref('shadow')}"/>` +
+      `</g>`;
+  }
   return `<g class="dk-group" data-id="${esc(g.id)}">` +
     `<rect x="${n1(g.x)}" y="${n1(g.y)}" width="${n1(g.w)}" height="${n1(g.h)}" rx="${S.groupRadius}" ${p.attrs({ fill: 'group', stroke: 'groupBorder', sw: S.stroke })}/>` +
     `</g>`;
 }
 
 // Group labels are drawn above the wires with a halo, so a wire entering the group passes behind them.
-function groupLabelSvg(g, p) {
+function groupLabelSvg(g, p, model) {
   const S = sizes;
+  if (g.icon) {
+    const cy = g.y + S.containerHead / 2;
+    const tx = g.x + S.padX + S.icon + S.iconGap;
+    return `<g class="dk-group-label" data-id="${esc(g.id)}">` +
+      iconSvg(model, g.icon, g.x + S.padX, cy - S.icon / 2, S.icon, p, g.tone ?? 'muted') +
+      textLines([String(g.label ?? '')], tx, cy - S.lineHeight / 2, S.lineHeight, S.label, p.attrs({ fill: 'text', font: ['sans', S.labelWeight, S.label] })) +
+      `</g>`;
+  }
   const label = String(g.label ?? '').toUpperCase();
   if (!label && !g.tone) return '';
   const dot = g.tone ? `<circle cx="${n1(g.x + 16)}" cy="${n1(g.y + 17)}" r="3" ${p.attrs({ fill: g.tone })}/>` : '';
@@ -548,11 +586,11 @@ function renderSvg(model, opts = {}) {
   const o = [];
   o.push(`<svg xmlns="http://www.w3.org/2000/svg" class="dk-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`);
   const shadowColor = p.mode === 'vars' ? 'var(--dk-shadow)' : p.tokens.shadow;
-  o.push(`<defs><filter id="dk-shadow" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="${shadowColor}"/></filter>` +
-    `<pattern id="dk-dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" ${p.attrs({ fill: 'dot' })}/></pattern></defs>`);
+  o.push(`<defs><filter id="${p.idPrefix}-shadow" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="${shadowColor}"/></filter>` +
+    `<pattern id="${p.idPrefix}-dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" ${p.attrs({ fill: 'dot' })}/></pattern></defs>`);
   if (opts.background) {
     o.push(`<rect width="${W}" height="${H}" ${p.attrs({ fill: 'bg' })}/>`);
-    o.push(`<rect width="${W}" height="${H}" fill="url(#dk-dots)"/>`);
+    o.push(`<rect width="${W}" height="${H}" fill="${p.ref('dots')}"/>`);
   }
   if (opts.title && model.title) {
     o.push(`<text x="32" y="${n1(baseline(34, sizes.title))}" ${p.attrs({ fill: 'text', font: ['sans', 600, sizes.title] })}>${esc(model.title)}</text>`);
@@ -576,7 +614,7 @@ function renderSvg(model, opts = {}) {
     if (l.label) o.push(`<rect x="${n1(l.x1 + 4)}" y="${n1(l.y1 + 4)}" width="${n1(l.labelW ?? 0)}" height="15" rx="3" ${p.attrs({ fill: 'bg', opacity: 0.92 })}/><text x="${n1(l.x1 + 8)}" y="${n1(baseline(l.y1 + 12, sizes.edge))}" ${p.attrs({ fill: 'muted', font: ['mono', 400, sizes.edge] })}>${esc(l.label)}</text>`);
   }
   for (const e of model.edges ?? []) o.push(edgeSvg(e, p));
-  for (const g of groups.filter((x) => x.variant !== 'fragment')) o.push(groupLabelSvg(g, p));
+  for (const g of groups.filter((x) => x.variant !== 'fragment')) o.push(groupLabelSvg(g, p, model));
   for (const n of model.nodes ?? []) o.push(nodeSvg(model, n, p));
   for (const e of model.edges ?? []) o.push(edgeLabelSvg(e, p));
   o.push('</g></svg>');
@@ -603,13 +641,19 @@ const svgIcon = (name) => `<svg viewBox="0 0 24 24" width="16" height="16" fill=
 const escHtml = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const isUrl = (s) => /^https?:\/\//.test(s);
 
+let mounts = 0;
+
+// options.embedded: the diagram sits inside a scrolling page. Plain wheel and vertical swipes
+// scroll the page; Ctrl/⌘ + wheel, pinch and horizontal drags move the diagram.
 function mountDiagram(root, model, options = {}) {
-  const opt = { themeToggle: true, themeTarget: document.documentElement, header: true, stepMs: 1500, ...options };
+  const opt = { themeToggle: true, themeTarget: document.documentElement, header: true, stepMs: 1500, embedded: false, ...options };
+  const idPrefix = `dk${++mounts}`;
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   root.classList.add('dk-root');
+  if (opt.embedded) root.classList.add('dk-embedded');
   const flows = model.flows ?? [];
   root.innerHTML =
-    `<div class="dk-stage" tabindex="0" aria-label="${escHtml(model.title || 'Diagram')}">${renderSvg(model, { mode: 'vars' })}</div>` +
+    `<div class="dk-stage" tabindex="0" aria-label="${escHtml(model.title || 'Diagram')}">${renderSvg(model, { mode: 'vars', idPrefix })}</div>` +
     (opt.header && model.title ? `<header class="dk-head"><h1>${escHtml(model.title)}${model.draft ? '<span class="dk-draft" title="The brief behind this diagram is not approved yet">Draft</span>' : ''}</h1>${model.subtitle ? `<p>${escHtml(model.subtitle)}</p>` : ''}</header>` : '') +
     `<div class="dk-tools" role="toolbar">` +
     `<button data-act="out" title="Zoom out (−)">${svgIcon('minus')}</button><button data-act="in" title="Zoom in (+)">${svgIcon('plus')}</button><button data-act="fit" title="Fit (F)">${svgIcon('fit')}</button>` +
@@ -667,6 +711,7 @@ function mountDiagram(root, model, options = {}) {
     apply();
   };
   const onWheel = (ev) => {
+    if (opt.embedded && !(ev.ctrlKey || ev.metaKey)) return; // let the page scroll
     ev.preventDefault();
     const r = stage.getBoundingClientRect();
     if (ev.ctrlKey || ev.metaKey) zoomAt(Math.exp(-ev.deltaY * 0.01), ev.clientX - r.left, ev.clientY - r.top);
@@ -786,7 +831,8 @@ function mountDiagram(root, model, options = {}) {
     return `<li><span class="dk-fid">${escHtml(id)}</span><span>${kind}${escHtml(f.text)}${src ? `<span class="dk-src">${src}</span>` : ''}</span></li>`;
   };
   const show = (item, type) => {
-    const title = type === 'edge' ? `${model.nodes.find((n) => n.id === item.from)?.label ?? item.from} → ${model.nodes.find((n) => n.id === item.to)?.label ?? item.to}` : item.label;
+    const name = (id) => (model.nodes.find((n) => n.id === id) ?? model.groups?.find((g) => g.id === id))?.label ?? id;
+    const title = type === 'edge' ? `${name(item.from)} → ${name(item.to)}` : item.label;
     const sub = type === 'edge' ? item.label : item.sub;
     const details = item.details ? `<dl>${Object.entries(item.details).map(([k, v]) => `<dt>${escHtml(k)}</dt><dd>${escHtml(v)}</dd>`).join('')}</dl>` : '';
     const facts = item.facts?.length ? `<ul class="dk-facts">${item.facts.map(factHtml).join('')}</ul>` : '';
@@ -946,7 +992,7 @@ function mountDiagram(root, model, options = {}) {
       root.removeEventListener('click', onRootClick);
       (opt.keyTarget ?? window).removeEventListener('keydown', onKey);
       root.innerHTML = '';
-      root.classList.remove('dk-root');
+      root.classList.remove('dk-root', 'dk-embedded');
     },
   };
 }
