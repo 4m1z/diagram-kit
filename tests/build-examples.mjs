@@ -5,12 +5,12 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const cli = join(root, 'plugins/diagram-kit/skills/diagram/scripts/diagram.mjs');
+const cli = join(root, 'plugins/diagram-kit/skills/create-diagram/scripts/diagram.mjs');
 const run = (args) => {
   try { console.log(execFileSync('node', [cli, ...args], { encoding: 'utf8' })); }
   catch (err) { console.log(err.stdout); process.exitCode = 1; }
 };
-const kinds = join(root, 'plugins/diagram-kit/skills/diagram/examples');
+const kinds = join(root, 'plugins/diagram-kit/skills/create-diagram/examples');
 const out = join(root, 'examples/kinds');
 mkdirSync(out, { recursive: true });
 for (const f of readdirSync(kinds)) run(['build', join(kinds, f), '--out', out, '--dark']);

@@ -1,9 +1,9 @@
 ---
-name: diagram
+name: create-diagram
 description: Make clear, well-positioned, interactive diagrams (system design and architecture, flowcharts, sequences, state machines, data models, trees, mind maps) from a request, a codebase or a document. Use when someone asks to diagram, visualize, map or draw how something works or fits together, or wants to understand part of a project visually. Not for charts of numbers.
 ---
 
-# Diagram
+# Create diagram
 
 Turn understanding into a picture that is correct, minimal and easy to read. You decide the meaning; the scripts decide the geometry. Never place coordinates yourself.
 

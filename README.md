@@ -41,17 +41,17 @@ codex plugin marketplace add Alireza29675/diagram-kit
 codex plugin add diagram-kit@diagram-kit
 ```
 
-or copy `plugins/diagram-kit/skills/diagram` into `.claude/skills/` or `.agents/skills/`.
+or copy `plugins/diagram-kit/skills/create-diagram` into `.claude/skills/` or `.agents/skills/`.
 
 then once per install (node 22.12+; codex will ask to run it outside the sandbox):
 
 ```
-npm ci --ignore-scripts --prefix <path-to>/skills/diagram/scripts
+npm ci --ignore-scripts --prefix <path-to>/skills/create-diagram/scripts
 ```
 
 ## use it
 
-just ask:
+just ask, or call the skill by name (`create-diagram`; in claude code `/diagram-kit:create-diagram`):
 
 - "diagram how a request flows through this repo"
 - "turn docs/architecture.md into diagrams"
@@ -61,8 +61,8 @@ just ask:
 or drive the scripts yourself:
 
 ```
-node skills/diagram/scripts/diagram.mjs example architecture > shop.yaml
-node skills/diagram/scripts/diagram.mjs build shop.yaml
+node skills/create-diagram/scripts/diagram.mjs example architecture > shop.yaml
+node skills/create-diagram/scripts/diagram.mjs build shop.yaml
 open shop.html
 ```
 

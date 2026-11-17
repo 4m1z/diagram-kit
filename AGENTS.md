@@ -1,11 +1,11 @@
 # diagram-kit
 
-A skill (plus its scripts) that lets Claude Code and Codex make clear, well-positioned, interactive diagrams. The product is `plugins/diagram-kit/skills/diagram/`; everything else packages, tests or demonstrates it.
+The `create-diagram` skill (plus its scripts) that lets Claude Code and Codex make clear, well-positioned, interactive diagrams. The product is `plugins/diagram-kit/skills/create-diagram/`; everything else packages, tests or demonstrates it.
 
 ## Map
 
 ```
-plugins/diagram-kit/skills/diagram/
+plugins/diagram-kit/skills/create-diagram/
   SKILL.md              the workflow agents follow
   references/           brief, spec, kinds, layout, design, environment, checklist
   examples/             one small spec per kind (`diagram example <kind>` prints them)
@@ -15,17 +15,17 @@ plugins/diagram-kit/skills/diagram/
   assets/               fonts, Lucide icons, font metrics, licences
 plugins/diagram-kit/.claude-plugin, .codex-plugin   plugin manifests
 .claude-plugin/, .agents/plugins/                   marketplaces
-.agents/skills/diagram -> the skill (and .claude/skills -> .agents/skills) for dogfooding here
+.agents/skills/create-diagram -> the skill (and .claude/skills -> .agents/skills) for dogfooding here
 examples/payments/      the showcase: brief, specs and built outputs
 tests/                  node:test suites
 ```
 
 ## Commands
 
-- Install once: `npm ci --ignore-scripts --prefix plugins/diagram-kit/skills/diagram/scripts`
+- Install once: `npm ci --ignore-scripts --prefix plugins/diagram-kit/skills/create-diagram/scripts`
 - Tests: `npm test`
 - Rebuild every example and the showcase: `npm run examples`
-- One diagram: `node plugins/diagram-kit/skills/diagram/scripts/diagram.mjs build <spec>`
+- One diagram: `node plugins/diagram-kit/skills/create-diagram/scripts/diagram.mjs build <spec>`
 
 ## Rules
 

@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
-const SKILL = fileURLToPath(new URL('../plugins/diagram-kit/skills/diagram/', import.meta.url));
+const SKILL = fileURLToPath(new URL('../plugins/diagram-kit/skills/create-diagram/', import.meta.url));
 const imp = (rel) => import(pathToFileURL(SKILL + rel).href);
 const { loadSpec, normalizeSpec, parseEdge, SpecError } = await imp('scripts/lib/spec.mjs');
 const { buildModel } = await imp('scripts/lib/build.mjs');
