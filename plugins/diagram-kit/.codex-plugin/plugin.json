@@ -1,0 +1,14 @@
+{
+  "name": "diagram-kit",
+  "version": "0.1.0",
+  "description": "Clear, well-positioned, interactive diagrams: architecture, flows, sequences, state machines, data models, trees and mind maps.",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Diagram Kit",
+    "shortDescription": "Well-positioned interactive diagrams",
+    "category": "Productivity",
+    "brandColor": "#5B5BD6",
+    "composerIcon": "./assets/logo.svg",
+    "logo": "./assets/logo.svg"
+  }
+}

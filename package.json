@@ -1,0 +1,14 @@
+{
+  "name": "diagram-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A Claude Code and Codex skill for clear, well-positioned, interactive diagrams.",
+  "license": "MIT",
+  "engines": { "node": ">=22.12" },
+  "scripts": {
+    "setup": "npm ci --ignore-scripts --prefix plugins/diagram-kit/skills/diagram/scripts",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "examples": "node tests/build-examples.mjs"
+  }
+}

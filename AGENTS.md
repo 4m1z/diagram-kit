@@ -1,0 +1,37 @@
+# diagram-kit
+
+A skill (plus its scripts) that lets Claude Code and Codex make clear, well-positioned, interactive diagrams. The product is `plugins/diagram-kit/skills/diagram/`; everything else packages, tests or demonstrates it.
+
+## Map
+
+```
+plugins/diagram-kit/skills/diagram/
+  SKILL.md              the workflow agents follow
+  references/           brief, spec, kinds, layout, design, environment, checklist
+  examples/             one small spec per kind (`diagram example <kind>` prints them)
+  scripts/diagram.mjs   CLI: build, check, png, react, metrics, example
+  scripts/lib/          spec -> layout (ELK, sequence, mindmap) -> model -> check, png, html
+  assets/viewer/        theme tokens, the SVG renderer and the viewer (browser-safe, shared)
+  assets/               fonts, Lucide icons, font metrics, licences
+plugins/diagram-kit/.claude-plugin, .codex-plugin   plugin manifests
+.claude-plugin/, .agents/plugins/                   marketplaces
+.agents/skills/diagram -> the skill (and .claude/skills -> .agents/skills) for dogfooding here
+examples/payments/      the showcase: brief, specs and built outputs
+tests/                  node:test suites
+```
+
+## Commands
+
+- Install once: `npm ci --ignore-scripts --prefix plugins/diagram-kit/skills/diagram/scripts`
+- Tests: `npm test`
+- Rebuild every example and the showcase: `npm run examples`
+- One diagram: `node plugins/diagram-kit/skills/diagram/scripts/diagram.mjs build <spec>`
+
+## Rules
+
+- The layout model (`*.layout.json`) is the contract between scripts and renderers. Change its shape only with a `MODEL_VERSION` bump.
+- `assets/viewer/*.mjs` must stay DOM-free at import time and free of npm imports: the HTML writer inlines them with a tiny bundler (no multi-line imports, no name clashes across the three files).
+- Every visual value is a token in `theme.mjs`. No literal colours elsewhere.
+- Keep dependencies few and pinned to exact versions; install with `--ignore-scripts`. New versions wait at least three days after release.
+- After a layout or renderer change: `npm test`, `npm run examples`, then look at every PNG in `examples/` before calling it done.
+- Agent-facing text (SKILL.md, references) is short bullets that keep every important point. Never write em dashes.

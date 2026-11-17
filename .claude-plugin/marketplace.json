@@ -1,0 +1,12 @@
+{
+  "name": "diagram-kit",
+  "description": "Clear, well-positioned, interactive diagrams made by agents.",
+  "owner": { "name": "Alireza Sheikholmolouki" },
+  "plugins": [
+    {
+      "name": "diagram-kit",
+      "source": "./plugins/diagram-kit",
+      "description": "The diagram skill: brief, spec, engine layout, checks and an interactive HTML page."
+    }
+  ]
+}
