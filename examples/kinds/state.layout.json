@@ -1,0 +1,377 @@
+{
+ "version": 1,
+ "kind": "state",
+ "engine": "graph",
+ "title": "Payment intent",
+ "subtitle": "",
+ "direction": "right",
+ "numbered": true,
+ "theme": {},
+ "nodes": [
+  {
+   "id": "start",
+   "label": "",
+   "shape": "start",
+   "x": 32,
+   "y": 134,
+   "w": 18,
+   "h": 18,
+   "lines": [],
+   "subLines": []
+  },
+  {
+   "id": "created",
+   "label": "Created",
+   "shape": "box",
+   "x": 110,
+   "y": 123,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Created"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "auth",
+   "label": "Authorized",
+   "shape": "box",
+   "x": 389,
+   "y": 100,
+   "w": 100,
+   "h": 40,
+   "lines": [
+    "Authorized"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "captured",
+   "label": "Captured",
+   "shape": "box",
+   "x": 664,
+   "y": 83,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Captured"
+   ],
+   "subLines": [],
+   "tone": "green"
+  },
+  {
+   "id": "failed",
+   "label": "Failed",
+   "shape": "box",
+   "x": 664,
+   "y": 149.33333333333331,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Failed"
+   ],
+   "subLines": [],
+   "tone": "red"
+  },
+  {
+   "id": "refunded",
+   "label": "Refunded",
+   "shape": "box",
+   "x": 924,
+   "y": 65,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Refunded"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "end",
+   "label": "",
+   "shape": "end",
+   "x": 1076,
+   "y": 112,
+   "w": 18,
+   "h": 18,
+   "lines": [],
+   "subLines": []
+  }
+ ],
+ "groups": [],
+ "edges": [
+  {
+   "id": "start->created",
+   "from": "start",
+   "to": "created",
+   "kind": "sync",
+   "points": [
+    [
+     50,
+     143
+    ],
+    [
+     110,
+     143
+    ]
+   ],
+   "labelBox": null
+  },
+  {
+   "id": "created->auth",
+   "from": "created",
+   "to": "auth",
+   "kind": "sync",
+   "label": "authorize",
+   "points": [
+    [
+     202,
+     136.33333333333331
+    ],
+    [
+     220,
+     136.33333333333331
+    ],
+    [
+     220,
+     120
+    ],
+    [
+     389,
+     120
+    ]
+   ],
+   "labelBox": {
+    "x": 262,
+    "y": 99,
+    "w": 67,
+    "h": 16
+   }
+  },
+  {
+   "id": "created->failed",
+   "from": "created",
+   "to": "failed",
+   "kind": "sync",
+   "label": "declined",
+   "points": [
+    [
+     202,
+     149.66666666666666
+    ],
+    [
+     220,
+     149.66666666666666
+    ],
+    [
+     220,
+     188.33333333333331
+    ],
+    [
+     622,
+     188.33333333333331
+    ],
+    [
+     622,
+     176
+    ],
+    [
+     664,
+     176
+    ]
+   ],
+   "labelBox": {
+    "x": 408.5,
+    "y": 193.33333333333331,
+    "w": 61,
+    "h": 16
+   }
+  },
+  {
+   "id": "auth->captured",
+   "from": "auth",
+   "to": "captured",
+   "kind": "sync",
+   "label": "capture",
+   "points": [
+    [
+     489,
+     113.33333333333333
+    ],
+    [
+     507,
+     113.33333333333333
+    ],
+    [
+     507,
+     103
+    ],
+    [
+     664,
+     103
+    ]
+   ],
+   "labelBox": {
+    "x": 549,
+    "y": 108,
+    "w": 55,
+    "h": 16
+   }
+  },
+  {
+   "id": "auth->failed",
+   "from": "auth",
+   "to": "failed",
+   "kind": "sync",
+   "label": "expired",
+   "points": [
+    [
+     489,
+     126.66666666666666
+    ],
+    [
+     507,
+     126.66666666666666
+    ],
+    [
+     507,
+     149.66666666666666
+    ],
+    [
+     622,
+     149.66666666666666
+    ],
+    [
+     622,
+     162.66666666666666
+    ],
+    [
+     664,
+     162.66666666666666
+    ]
+   ],
+   "labelBox": {
+    "x": 549,
+    "y": 154.66666666666666,
+    "w": 55,
+    "h": 16
+   }
+  },
+  {
+   "id": "captured->refunded",
+   "from": "captured",
+   "to": "refunded",
+   "kind": "sync",
+   "label": "refund",
+   "points": [
+    [
+     756,
+     96.33333333333333
+    ],
+    [
+     774,
+     96.33333333333333
+    ],
+    [
+     774,
+     85
+    ],
+    [
+     924,
+     85
+    ]
+   ],
+   "labelBox": {
+    "x": 816,
+    "y": 64,
+    "w": 48,
+    "h": 16
+   }
+  },
+  {
+   "id": "captured->end",
+   "from": "captured",
+   "to": "end",
+   "kind": "sync",
+   "points": [
+    [
+     756,
+     109.66666666666667
+    ],
+    [
+     774,
+     109.66666666666667
+    ],
+    [
+     774,
+     121
+    ],
+    [
+     1076,
+     121
+    ]
+   ],
+   "labelBox": null
+  },
+  {
+   "id": "refunded->end",
+   "from": "refunded",
+   "to": "end",
+   "kind": "sync",
+   "points": [
+    [
+     1016,
+     85
+    ],
+    [
+     1034,
+     85
+    ],
+    [
+     1034,
+     116.5
+    ],
+    [
+     1076,
+     116.5
+    ]
+   ],
+   "labelBox": null
+  },
+  {
+   "id": "failed->end",
+   "from": "failed",
+   "to": "end",
+   "kind": "sync",
+   "points": [
+    [
+     756,
+     169.33333333333331
+    ],
+    [
+     1034,
+     169.33333333333331
+    ],
+    [
+     1034,
+     125.5
+    ],
+    [
+     1076,
+     125.5
+    ]
+   ],
+   "labelBox": null
+  }
+ ],
+ "lines": [],
+ "bars": [],
+ "flows": [],
+ "brief": null,
+ "facts": {},
+ "draft": false,
+ "requireSources": false,
+ "icons": {},
+ "width": 1126,
+ "height": 242
+}

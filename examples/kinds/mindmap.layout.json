@@ -1,0 +1,456 @@
+{
+ "version": 1,
+ "kind": "mindmap",
+ "engine": "mindmap",
+ "title": "Launch plan",
+ "subtitle": "",
+ "direction": null,
+ "numbered": true,
+ "theme": {},
+ "nodes": [
+  {
+   "id": "v1-launch",
+   "label": "v1 launch",
+   "shape": "pill",
+   "tone": "accent",
+   "x": 344,
+   "y": 173,
+   "w": 100,
+   "h": 40,
+   "lines": [
+    "v1 launch"
+   ],
+   "subLines": [],
+   "depth": 0
+  },
+  {
+   "id": "product",
+   "label": "Product",
+   "shape": "box",
+   "x": 500,
+   "y": 142,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Product"
+   ],
+   "subLines": [],
+   "depth": 1
+  },
+  {
+   "id": "onboarding",
+   "label": "Onboarding",
+   "shape": "box",
+   "x": 648,
+   "y": 90,
+   "w": 104,
+   "h": 40,
+   "lines": [
+    "Onboarding"
+   ],
+   "subLines": [],
+   "depth": 2
+  },
+  {
+   "id": "pricing-page",
+   "label": "Pricing page",
+   "shape": "box",
+   "x": 648,
+   "y": 142,
+   "w": 108,
+   "h": 40,
+   "lines": [
+    "Pricing page"
+   ],
+   "subLines": [],
+   "depth": 2
+  },
+  {
+   "id": "docs",
+   "label": "Docs",
+   "shape": "box",
+   "x": 648,
+   "y": 194,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Docs"
+   ],
+   "subLines": [],
+   "depth": 2
+  },
+  {
+   "id": "support",
+   "label": "Support",
+   "shape": "box",
+   "x": 500,
+   "y": 256,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Support"
+   ],
+   "subLines": [],
+   "depth": 1
+  },
+  {
+   "id": "help-center",
+   "label": "Help center",
+   "shape": "box",
+   "x": 648,
+   "y": 256,
+   "w": 100,
+   "h": 40,
+   "lines": [
+    "Help center"
+   ],
+   "subLines": [],
+   "depth": 2
+  },
+  {
+   "id": "growth",
+   "label": "Growth",
+   "shape": "box",
+   "x": 196,
+   "y": 90,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Growth"
+   ],
+   "subLines": [],
+   "depth": 1
+  },
+  {
+   "id": "changelog",
+   "label": "Changelog",
+   "shape": "box",
+   "x": 44,
+   "y": 64,
+   "w": 96,
+   "h": 40,
+   "lines": [
+    "Changelog"
+   ],
+   "subLines": [],
+   "depth": 2
+  },
+  {
+   "id": "launch-post",
+   "label": "Launch post",
+   "shape": "box",
+   "x": 32,
+   "y": 116,
+   "w": 108,
+   "h": 40,
+   "lines": [
+    "Launch post"
+   ],
+   "subLines": [],
+   "depth": 2
+  },
+  {
+   "id": "reliability",
+   "label": "Reliability",
+   "shape": "box",
+   "x": 196,
+   "y": 230,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Reliability"
+   ],
+   "subLines": [],
+   "depth": 1
+  },
+  {
+   "id": "status-page",
+   "label": "Status page",
+   "shape": "box",
+   "x": 36,
+   "y": 178,
+   "w": 104,
+   "h": 40,
+   "lines": [
+    "Status page"
+   ],
+   "subLines": [],
+   "depth": 2
+  },
+  {
+   "id": "alerts",
+   "label": "Alerts",
+   "shape": "box",
+   "x": 48,
+   "y": 230,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Alerts"
+   ],
+   "subLines": [],
+   "depth": 2
+  },
+  {
+   "id": "backups",
+   "label": "Backups",
+   "shape": "box",
+   "x": 48,
+   "y": 282,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Backups"
+   ],
+   "subLines": [],
+   "depth": 2
+  }
+ ],
+ "groups": [],
+ "edges": [
+  {
+   "id": "v1-launch->product",
+   "from": "v1-launch",
+   "to": "product",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     444,
+     193
+    ],
+    [
+     500,
+     162
+    ]
+   ]
+  },
+  {
+   "id": "product->onboarding",
+   "from": "product",
+   "to": "onboarding",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     592,
+     162
+    ],
+    [
+     648,
+     110
+    ]
+   ]
+  },
+  {
+   "id": "product->pricing-page",
+   "from": "product",
+   "to": "pricing-page",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     592,
+     162
+    ],
+    [
+     648,
+     162
+    ]
+   ]
+  },
+  {
+   "id": "product->docs",
+   "from": "product",
+   "to": "docs",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     592,
+     162
+    ],
+    [
+     648,
+     214
+    ]
+   ]
+  },
+  {
+   "id": "v1-launch->support",
+   "from": "v1-launch",
+   "to": "support",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     444,
+     193
+    ],
+    [
+     500,
+     276
+    ]
+   ]
+  },
+  {
+   "id": "support->help-center",
+   "from": "support",
+   "to": "help-center",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     592,
+     276
+    ],
+    [
+     648,
+     276
+    ]
+   ]
+  },
+  {
+   "id": "v1-launch->growth",
+   "from": "v1-launch",
+   "to": "growth",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     344,
+     193
+    ],
+    [
+     288,
+     110
+    ]
+   ]
+  },
+  {
+   "id": "growth->changelog",
+   "from": "growth",
+   "to": "changelog",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     196,
+     110
+    ],
+    [
+     140,
+     84
+    ]
+   ]
+  },
+  {
+   "id": "growth->launch-post",
+   "from": "growth",
+   "to": "launch-post",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     196,
+     110
+    ],
+    [
+     140,
+     136
+    ]
+   ]
+  },
+  {
+   "id": "v1-launch->reliability",
+   "from": "v1-launch",
+   "to": "reliability",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     344,
+     193
+    ],
+    [
+     288,
+     250
+    ]
+   ]
+  },
+  {
+   "id": "reliability->status-page",
+   "from": "reliability",
+   "to": "status-page",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     196,
+     250
+    ],
+    [
+     140,
+     198
+    ]
+   ]
+  },
+  {
+   "id": "reliability->alerts",
+   "from": "reliability",
+   "to": "alerts",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     196,
+     250
+    ],
+    [
+     140,
+     250
+    ]
+   ]
+  },
+  {
+   "id": "reliability->backups",
+   "from": "reliability",
+   "to": "backups",
+   "kind": "weak",
+   "curve": true,
+   "arrow": false,
+   "points": [
+    [
+     196,
+     250
+    ],
+    [
+     140,
+     302
+    ]
+   ]
+  }
+ ],
+ "lines": [],
+ "bars": [],
+ "flows": [],
+ "brief": null,
+ "facts": {},
+ "draft": false,
+ "requireSources": false,
+ "icons": {},
+ "width": 788,
+ "height": 354
+}

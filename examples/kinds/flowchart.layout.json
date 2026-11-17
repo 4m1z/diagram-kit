@@ -1,0 +1,428 @@
+{
+ "version": 1,
+ "kind": "flowchart",
+ "engine": "graph",
+ "title": "Deploy gate",
+ "subtitle": "",
+ "direction": "down",
+ "numbered": true,
+ "theme": {},
+ "nodes": [
+  {
+   "id": "push",
+   "label": "Push to main",
+   "shape": "pill",
+   "x": 206.33333333333331,
+   "y": 64,
+   "w": 120,
+   "h": 40,
+   "lines": [
+    "Push to main"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "ci",
+   "label": "Run tests",
+   "icon": "flask-conical",
+   "shape": "box",
+   "x": 208.33333333333331,
+   "y": 164,
+   "w": 116,
+   "h": 40,
+   "lines": [
+    "Run tests"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "green",
+   "label": "All green?",
+   "shape": "diamond",
+   "x": 198.33333333333331,
+   "y": 264,
+   "w": 136,
+   "h": 64,
+   "lines": [
+    "All green?"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "stage",
+   "label": "Deploy to staging",
+   "icon": "rocket",
+   "shape": "box",
+   "x": 117.33333333333331,
+   "y": 464,
+   "w": 164,
+   "h": 40,
+   "lines": [
+    "Deploy to staging"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "smoke",
+   "label": "Smoke checks pass?",
+   "shape": "diamond",
+   "x": 81.33333333333331,
+   "y": 564,
+   "w": 236,
+   "h": 64,
+   "lines": [
+    "Smoke checks pass?"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "prod",
+   "label": "Promote to production",
+   "icon": "rocket",
+   "shape": "box",
+   "x": 32,
+   "y": 764,
+   "w": 196,
+   "h": 40,
+   "lines": [
+    "Promote to production"
+   ],
+   "subLines": [],
+   "tone": "accent"
+  },
+  {
+   "id": "fix",
+   "label": "Notify the author",
+   "icon": "bell",
+   "shape": "box",
+   "x": 254,
+   "y": 764,
+   "w": 164,
+   "h": 40,
+   "lines": [
+    "Notify the author"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "done",
+   "label": "Done",
+   "shape": "pill",
+   "x": 187,
+   "y": 864,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Done"
+   ],
+   "subLines": []
+  }
+ ],
+ "groups": [],
+ "edges": [
+  {
+   "id": "push->ci",
+   "from": "push",
+   "to": "ci",
+   "kind": "sync",
+   "points": [
+    [
+     266.3333333333333,
+     104
+    ],
+    [
+     266.3333333333333,
+     164
+    ]
+   ],
+   "labelBox": null
+  },
+  {
+   "id": "ci->green",
+   "from": "ci",
+   "to": "green",
+   "kind": "sync",
+   "points": [
+    [
+     266.3333333333333,
+     204
+    ],
+    [
+     266.3333333333333,
+     264
+    ]
+   ],
+   "labelBox": null
+  },
+  {
+   "id": "green->stage",
+   "from": "green",
+   "to": "stage",
+   "kind": "sync",
+   "label": "yes",
+   "points": [
+    [
+     243.66666666666666,
+     328
+    ],
+    [
+     243.66666666666666,
+     346
+    ],
+    [
+     199.33333333333331,
+     346
+    ],
+    [
+     199.33333333333331,
+     464
+    ]
+   ],
+   "labelBox": {
+    "x": 166.33333333333331,
+    "y": 388,
+    "w": 29,
+    "h": 16
+   }
+  },
+  {
+   "id": "green->fix",
+   "from": "green",
+   "to": "fix",
+   "kind": "sync",
+   "label": "no",
+   "points": [
+    [
+     289,
+     328
+    ],
+    [
+     289,
+     346
+    ],
+    [
+     363.3333333333333,
+     346
+    ],
+    [
+     363.3333333333333,
+     764
+    ]
+   ],
+   "labelBox": {
+    "x": 368.3333333333333,
+    "y": 476,
+    "w": 23,
+    "h": 16
+   }
+  },
+  {
+   "id": "stage->smoke",
+   "from": "stage",
+   "to": "smoke",
+   "kind": "sync",
+   "points": [
+    [
+     199.33333333333331,
+     504
+    ],
+    [
+     199.33333333333331,
+     564
+    ]
+   ],
+   "labelBox": null
+  },
+  {
+   "id": "smoke->prod",
+   "from": "smoke",
+   "to": "prod",
+   "kind": "sync",
+   "label": "yes",
+   "points": [
+    [
+     160,
+     628
+    ],
+    [
+     160,
+     646
+    ],
+    [
+     130,
+     646
+    ],
+    [
+     130,
+     764
+    ]
+   ],
+   "labelBox": {
+    "x": 97,
+    "y": 688,
+    "w": 29,
+    "h": 16
+   }
+  },
+  {
+   "id": "smoke->fix",
+   "from": "smoke",
+   "to": "fix",
+   "kind": "sync",
+   "label": "no",
+   "points": [
+    [
+     238.66666666666666,
+     628
+    ],
+    [
+     238.66666666666666,
+     646
+    ],
+    [
+     288.66666666666663,
+     646
+    ],
+    [
+     288.66666666666663,
+     722
+    ],
+    [
+     308.6666666666667,
+     722
+    ],
+    [
+     308.6666666666667,
+     764
+    ]
+   ],
+   "labelBox": {
+    "x": 261.66666666666663,
+    "y": 688,
+    "w": 23,
+    "h": 16
+   }
+  },
+  {
+   "id": "prod->done",
+   "from": "prod",
+   "to": "done",
+   "kind": "sync",
+   "points": [
+    [
+     130,
+     804
+    ],
+    [
+     130,
+     822
+    ],
+    [
+     217.66666666666666,
+     822
+    ],
+    [
+     217.66666666666666,
+     864
+    ]
+   ],
+   "labelBox": null
+  },
+  {
+   "id": "fix->done",
+   "from": "fix",
+   "to": "done",
+   "kind": "sync",
+   "points": [
+    [
+     336,
+     804
+    ],
+    [
+     336,
+     822
+    ],
+    [
+     248.33333333333334,
+     822
+    ],
+    [
+     248.33333333333334,
+     864
+    ]
+   ],
+   "labelBox": null
+  }
+ ],
+ "lines": [],
+ "bars": [],
+ "flows": [],
+ "brief": null,
+ "facts": {},
+ "draft": false,
+ "requireSources": false,
+ "icons": {
+  "flask-conical": [
+   [
+    "path",
+    {
+     "d": "M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M6.453 15h11.094"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M8.5 2h7"
+    }
+   ]
+  ],
+  "rocket": [
+   [
+    "path",
+    {
+     "d": "M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"
+    }
+   ]
+  ],
+  "bell": [
+   [
+    "path",
+    {
+     "d": "M10.268 21a2 2 0 0 0 3.464 0"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
+    }
+   ]
+  ]
+ },
+ "width": 450,
+ "height": 936
+}

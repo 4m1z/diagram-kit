@@ -1,0 +1,73 @@
+kind: architecture
+title: "Payments: overview"
+subtitle: Card payments, one region
+brief: ./payments-brief.md
+direction: down
+tiers: [clients, edge, core, data, events]
+groups:
+  - {id: clients, label: Merchant, tier: clients}
+  - {id: core, label: Payment core, tier: core}
+  - {id: pci, label: PCI zone, parent: core, tone: amber, about: The only place card numbers exist. Everything outside it handles tokens., facts: [F7, D1]}
+  - {id: data, label: Storage, tier: data}
+  - {id: external, label: External, tier: data}
+  - {id: events, label: Events, tier: events}
+nodes:
+  - {id: merchant, label: Merchant backend, icon: store, group: clients, about: The merchant's server. Creates payments and receives webhooks., facts: [D3]}
+  - {id: checkout, label: Checkout form, icon: credit-card, group: clients, about: Collects card details in the browser and sends them straight to the vault., facts: [F7]}
+  - {id: gateway, label: API gateway, sub: auth · rate limits, icon: door-open, tier: edge}
+  - {id: api, label: Payments API, sub: idempotent, icon: server, group: core, about: Validates requests and returns the stored result for a repeated idempotency key., facts: [F1]}
+  - {id: saga, label: Orchestrator, sub: saga, icon: workflow, group: core, about: Runs each payment as a saga of local steps with compensations., facts: [F4]}
+  - {id: risk, label: Risk scoring, icon: shield-check, group: core, about: Scores every payment before money moves; high risk is blocked., facts: [F10, D5]}
+  - {id: ledger, label: Ledger, sub: double-entry, icon: book-open, group: core, about: Turns every money movement into balanced debit and credit entries., facts: [F6, D4]}
+  - {id: vault, label: Card vault, sub: tokens, icon: lock, group: pci, tone: amber, about: Stores card numbers and hands out tokens; the only part that sees raw card data., facts: [F7, D1]}
+  - {id: idem, label: Idempotency keys, sub: Redis, icon: key-round, group: data, facts: [F1]}
+  - {id: paydb, label: Payments DB, sub: Postgres · outbox, icon: database, group: data, about: Payment state and the outbox table, written in one transaction., facts: [F3, D2]}
+  - {id: ledgerdb, label: Ledger DB, sub: append-only, icon: database, group: data, facts: [F6]}
+  - {id: acquirer, label: Acquirer, sub: card networks, icon: landmark, group: external, about: Authorizes card payments with the issuing bank and settles funds later., facts: [F2]}
+  - {id: relay, label: Outbox relay, sub: CDC, icon: refresh-cw, group: events, about: Reads committed outbox rows from the write-ahead log and publishes them., facts: [F3, F5]}
+  - {id: bus, label: Event bus, sub: Kafka, icon: waypoints, group: events, about: Ordered per partition; payments are keyed by id so their events stay in order., facts: [F9, D3]}
+  - {id: webhooks, label: Webhook sender, icon: webhook, group: events, about: Delivers events to merchants and retries failed deliveries with backoff., facts: [F8, D3]}
+  - {id: recon, label: Reconciler, sub: daily, icon: scale, group: events, about: Matches the acquirer's settlement files against the ledger., facts: [D4, A1]}
+edges:
+  - "checkout -> vault: card → token"
+  - "merchant -> gateway: POST /payments"
+  - "gateway -> api"
+  - "api ..> idem: check key"
+  - "api -> saga: start"
+  - "saga -> risk: score"
+  - "saga -> vault: charge token"
+  - "vault -> acquirer: authorize"
+  - "saga -> ledger: post"
+  - "ledger ..> ledgerdb: append"
+  - "saga ..> paydb: state + outbox"
+  - "paydb ..> relay: WAL"
+  - "relay ~> bus: publish"
+  - "bus ~> webhooks"
+  - {from: webhooks, to: merchant, label: payment.authorized, kind: async, back: true}
+  - "acquirer ..> recon: settlement file"
+  - "recon ..> ledgerdb: match"
+flows:
+  - label: Card payment
+    steps:
+      - {edge: "merchant -> gateway", text: Merchant creates a payment with an idempotency key}
+      - {edge: "gateway -> api", text: Authenticated and rate limited}
+      - {edge: "api ..> idem", text: A repeated key returns the first result}
+      - {edge: "api -> saga", text: The payment runs as a saga}
+      - {edge: "saga -> risk", text: Risk is scored before money moves}
+      - {edge: "saga -> vault", text: Only the vault sees the card number}
+      - {edge: "vault -> acquirer", text: Authorized with the card network}
+      - {edge: "saga -> ledger", text: Balanced entries are posted}
+      - {edge: "saga ..> paydb", text: State and outbox commit together}
+      - {edge: "paydb ..> relay", text: The relay reads the outbox from the WAL}
+      - {edge: "relay ~> bus", text: payment.authorized is published}
+      - {edge: "bus ~> webhooks", text: The webhook sender consumes it}
+      - {edge: "webhooks ~> merchant", text: The merchant is notified, with retries}
+  - label: Retry after a timeout
+    steps:
+      - {edge: "merchant -> gateway", text: The merchant retries with the same key}
+      - {edge: "gateway -> api", text: Same request reaches the API}
+      - {edge: "api ..> idem", text: The stored result is returned; nothing is charged twice}
+  - label: Reconciliation
+    steps:
+      - {edge: "acquirer ..> recon", text: Daily settlement file arrives}
+      - {edge: "recon ..> ledgerdb", text: Every settled amount is matched to ledger entries}

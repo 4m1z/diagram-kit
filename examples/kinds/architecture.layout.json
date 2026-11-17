@@ -1,0 +1,521 @@
+{
+ "version": 1,
+ "kind": "architecture",
+ "engine": "graph",
+ "title": "URL shortener",
+ "subtitle": "Redirect path",
+ "direction": "right",
+ "numbered": true,
+ "theme": {},
+ "nodes": [
+  {
+   "id": "browser",
+   "label": "Browser",
+   "icon": "app-window",
+   "shape": "box",
+   "x": 32,
+   "y": 160.33333333333331,
+   "w": 108,
+   "h": 40,
+   "lines": [
+    "Browser"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "cdn",
+   "label": "CDN",
+   "icon": "globe",
+   "shape": "box",
+   "x": 321,
+   "y": 153.66666666666666,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "CDN"
+   ],
+   "subLines": [],
+   "about": "Caches 301s for popular links."
+  },
+  {
+   "id": "api",
+   "label": "Redirect API",
+   "sub": "Go",
+   "icon": "server",
+   "shape": "box",
+   "x": 592,
+   "y": 145.66666666666666,
+   "w": 132,
+   "h": 56,
+   "lines": [
+    "Redirect API"
+   ],
+   "subLines": [
+    "Go"
+   ],
+   "group": "app"
+  },
+  {
+   "id": "writer",
+   "label": "Shorten API",
+   "sub": "Go",
+   "icon": "server",
+   "shape": "box",
+   "x": 594,
+   "y": 221.66666666666666,
+   "w": 128,
+   "h": 56,
+   "lines": [
+    "Shorten API"
+   ],
+   "subLines": [
+    "Go"
+   ],
+   "group": "app"
+  },
+  {
+   "id": "cache",
+   "label": "Hot links",
+   "sub": "Redis",
+   "icon": "zap",
+   "shape": "box",
+   "x": 951,
+   "y": 120,
+   "w": 112,
+   "h": 56,
+   "lines": [
+    "Hot links"
+   ],
+   "subLines": [
+    "Redis"
+   ],
+   "group": "data"
+  },
+  {
+   "id": "db",
+   "label": "Links",
+   "sub": "Postgres",
+   "icon": "database",
+   "shape": "box",
+   "x": 951,
+   "y": 196,
+   "w": 108,
+   "h": 56,
+   "lines": [
+    "Links"
+   ],
+   "subLines": [
+    "Postgres"
+   ],
+   "group": "data"
+  }
+ ],
+ "groups": [
+  {
+   "id": "app",
+   "label": "App",
+   "x": 574,
+   "y": 105.66666666666666,
+   "w": 168,
+   "h": 190,
+   "depth": 0
+  },
+  {
+   "id": "data",
+   "label": "Data",
+   "x": 933,
+   "y": 80,
+   "w": 148,
+   "h": 190,
+   "depth": 0
+  }
+ ],
+ "edges": [
+  {
+   "id": "browser->cdn",
+   "from": "browser",
+   "to": "cdn",
+   "kind": "sync",
+   "label": "GET /abc",
+   "points": [
+    [
+     140,
+     173.66666666666666
+    ],
+    [
+     321,
+     173.66666666666669
+    ]
+   ],
+   "labelBox": {
+    "x": 200,
+    "y": 152.66666666666666,
+    "w": 61,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "follow-a-link",
+     "step": 1,
+     "x": 189,
+     "y": 160.66666666666666
+    }
+   ]
+  },
+  {
+   "id": "cdn->api",
+   "from": "cdn",
+   "to": "api",
+   "kind": "sync",
+   "label": "miss",
+   "points": [
+    [
+     413,
+     173.66666666666669
+    ],
+    [
+     592,
+     173.66666666666666
+    ]
+   ],
+   "labelBox": {
+    "x": 473,
+    "y": 152.66666666666666,
+    "w": 36,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "follow-a-link",
+     "step": 2,
+     "x": 462,
+     "y": 160.66666666666666
+    }
+   ]
+  },
+  {
+   "id": "api->cache",
+   "from": "api",
+   "to": "cache",
+   "kind": "data",
+   "label": "lookup",
+   "points": [
+    [
+     724,
+     164.33333333333331
+    ],
+    [
+     765,
+     164.33333333333331
+    ],
+    [
+     765,
+     156.66666666666666
+    ],
+    [
+     886,
+     156.66666666666666
+    ],
+    [
+     886,
+     148
+    ],
+    [
+     951,
+     148
+    ]
+   ],
+   "labelBox": {
+    "x": 813.5,
+    "y": 161.66666666666666,
+    "w": 48,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "follow-a-link",
+     "step": 3,
+     "x": 802.5,
+     "y": 169.66666666666666
+    }
+   ]
+  },
+  {
+   "id": "api->db",
+   "from": "api",
+   "to": "db",
+   "kind": "data",
+   "label": "fallback",
+   "points": [
+    [
+     724,
+     183
+    ],
+    [
+     765,
+     182.99999999999997
+    ],
+    [
+     765,
+     190.66666666666666
+    ],
+    [
+     886,
+     190.66666666666666
+    ],
+    [
+     886,
+     214.66666666666666
+    ],
+    [
+     951,
+     214.66666666666666
+    ]
+   ],
+   "labelBox": {
+    "x": 807,
+    "y": 195.66666666666669,
+    "w": 61,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "follow-a-link",
+     "step": 4,
+     "x": 796,
+     "y": 203.66666666666669
+    }
+   ]
+  },
+  {
+   "id": "browser->writer",
+   "from": "browser",
+   "to": "writer",
+   "kind": "sync",
+   "label": "POST /links",
+   "points": [
+    [
+     140,
+     187
+    ],
+    [
+     158,
+     187
+    ],
+    [
+     158,
+     234.66666666666669
+    ],
+    [
+     527,
+     234.66666666666669
+    ],
+    [
+     527,
+     249.66666666666669
+    ],
+    [
+     594,
+     249.66666666666663
+    ]
+   ],
+   "labelBox": {
+    "x": 327,
+    "y": 239.66666666666669,
+    "w": 80,
+    "h": 16
+   }
+  },
+  {
+   "id": "writer->db",
+   "from": "writer",
+   "to": "db",
+   "kind": "data",
+   "label": "insert",
+   "points": [
+    [
+     722,
+     249.66666666666666
+    ],
+    [
+     886,
+     249.66666666666666
+    ],
+    [
+     886,
+     233.33333333333331
+    ],
+    [
+     951,
+     233.33333333333331
+    ]
+   ],
+   "labelBox": {
+    "x": 813.5,
+    "y": 254.66666666666669,
+    "w": 48,
+    "h": 16
+   }
+  }
+ ],
+ "lines": [],
+ "bars": [],
+ "flows": [
+  {
+   "id": "follow-a-link",
+   "label": "Follow a link",
+   "primary": true,
+   "steps": [
+    {
+     "edge": "browser->cdn",
+     "text": "GET /abc"
+    },
+    {
+     "edge": "cdn->api",
+     "text": "miss"
+    },
+    {
+     "edge": "api->cache",
+     "text": "lookup"
+    },
+    {
+     "edge": "api->db",
+     "text": "fallback"
+    }
+   ]
+  }
+ ],
+ "brief": null,
+ "facts": {},
+ "draft": false,
+ "requireSources": false,
+ "icons": {
+  "app-window": [
+   [
+    "rect",
+    {
+     "x": "2",
+     "y": "4",
+     "width": "20",
+     "height": "16",
+     "rx": "2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M10 4v4"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M2 8h20"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M6 4v4"
+    }
+   ]
+  ],
+  "globe": [
+   [
+    "circle",
+    {
+     "cx": "12",
+     "cy": "12",
+     "r": "10"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M2 12h20"
+    }
+   ]
+  ],
+  "server": [
+   [
+    "rect",
+    {
+     "width": "20",
+     "height": "8",
+     "x": "2",
+     "y": "2",
+     "rx": "2",
+     "ry": "2"
+    }
+   ],
+   [
+    "rect",
+    {
+     "width": "20",
+     "height": "8",
+     "x": "2",
+     "y": "14",
+     "rx": "2",
+     "ry": "2"
+    }
+   ],
+   [
+    "line",
+    {
+     "x1": "6",
+     "x2": "6.01",
+     "y1": "6",
+     "y2": "6"
+    }
+   ],
+   [
+    "line",
+    {
+     "x1": "6",
+     "x2": "6.01",
+     "y1": "18",
+     "y2": "18"
+    }
+   ]
+  ],
+  "zap": [
+   [
+    "path",
+    {
+     "d": "M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"
+    }
+   ]
+  ],
+  "database": [
+   [
+    "ellipse",
+    {
+     "cx": "12",
+     "cy": "5",
+     "rx": "9",
+     "ry": "3"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M3 5V19A9 3 0 0 0 21 19V5"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M3 12A9 3 0 0 0 21 12"
+    }
+   ]
+  ]
+ },
+ "width": 1113,
+ "height": 328
+}

@@ -1,0 +1,417 @@
+{
+ "version": 1,
+ "kind": "tree",
+ "engine": "tree",
+ "title": "Monorepo",
+ "subtitle": "",
+ "direction": "right",
+ "numbered": true,
+ "theme": {},
+ "nodes": [
+  {
+   "id": "repo",
+   "label": "repo",
+   "icon": "folder-git-2",
+   "shape": "box",
+   "x": 32,
+   "y": 302,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "repo"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "apps",
+   "label": "apps",
+   "icon": "folder",
+   "shape": "box",
+   "x": 184,
+   "y": 113,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "apps"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "web",
+   "label": "web",
+   "sub": "Next.js",
+   "shape": "box",
+   "x": 328,
+   "y": 64,
+   "w": 92,
+   "h": 56,
+   "lines": [
+    "web"
+   ],
+   "subLines": [
+    "Next.js"
+   ]
+  },
+  {
+   "id": "api",
+   "label": "api",
+   "sub": "Hono",
+   "shape": "box",
+   "x": 328,
+   "y": 146,
+   "w": 92,
+   "h": 56,
+   "lines": [
+    "api"
+   ],
+   "subLines": [
+    "Hono"
+   ]
+  },
+  {
+   "id": "packages",
+   "label": "packages",
+   "icon": "folder",
+   "shape": "box",
+   "x": 168,
+   "y": 302,
+   "w": 116,
+   "h": 40,
+   "lines": [
+    "packages"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "ui",
+   "label": "ui",
+   "shape": "box",
+   "x": 328,
+   "y": 228,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "ui"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "db",
+   "label": "db",
+   "sub": "Drizzle",
+   "shape": "box",
+   "x": 328,
+   "y": 294,
+   "w": 92,
+   "h": 56,
+   "lines": [
+    "db"
+   ],
+   "subLines": [
+    "Drizzle"
+   ]
+  },
+  {
+   "id": "config",
+   "label": "config",
+   "shape": "box",
+   "x": 328,
+   "y": 376,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "config"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "infra",
+   "label": "infra",
+   "icon": "folder",
+   "shape": "box",
+   "x": 180,
+   "y": 442,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "infra"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "terraform",
+   "label": "terraform",
+   "shape": "box",
+   "x": 328,
+   "y": 442,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "terraform"
+   ],
+   "subLines": []
+  }
+ ],
+ "groups": [],
+ "edges": [
+  {
+   "id": "repo->apps",
+   "from": "repo",
+   "to": "apps",
+   "kind": "weak",
+   "points": [
+    [
+     124,
+     312
+    ],
+    [
+     142,
+     312
+    ],
+    [
+     142,
+     133
+    ],
+    [
+     184,
+     133
+    ]
+   ],
+   "arrow": false,
+   "labelBox": null
+  },
+  {
+   "id": "apps->web",
+   "from": "apps",
+   "to": "web",
+   "kind": "weak",
+   "points": [
+    [
+     276,
+     126.33333333333333
+    ],
+    [
+     302,
+     126.33333333333333
+    ],
+    [
+     302,
+     92
+    ],
+    [
+     328,
+     92
+    ]
+   ],
+   "arrow": false,
+   "labelBox": null
+  },
+  {
+   "id": "apps->api",
+   "from": "apps",
+   "to": "api",
+   "kind": "weak",
+   "points": [
+    [
+     276,
+     139.66666666666666
+    ],
+    [
+     302,
+     139.66666666666666
+    ],
+    [
+     302,
+     174
+    ],
+    [
+     328,
+     174
+    ]
+   ],
+   "arrow": false,
+   "labelBox": null
+  },
+  {
+   "id": "repo->packages",
+   "from": "repo",
+   "to": "packages",
+   "kind": "weak",
+   "points": [
+    [
+     124,
+     322
+    ],
+    [
+     168,
+     322
+    ]
+   ],
+   "arrow": false,
+   "labelBox": null
+  },
+  {
+   "id": "packages->ui",
+   "from": "packages",
+   "to": "ui",
+   "kind": "weak",
+   "points": [
+    [
+     284,
+     312
+    ],
+    [
+     302,
+     312
+    ],
+    [
+     302,
+     248
+    ],
+    [
+     328,
+     248
+    ]
+   ],
+   "arrow": false,
+   "labelBox": null
+  },
+  {
+   "id": "packages->db",
+   "from": "packages",
+   "to": "db",
+   "kind": "weak",
+   "points": [
+    [
+     284,
+     322
+    ],
+    [
+     328,
+     322
+    ]
+   ],
+   "arrow": false,
+   "labelBox": null
+  },
+  {
+   "id": "packages->config",
+   "from": "packages",
+   "to": "config",
+   "kind": "weak",
+   "points": [
+    [
+     284,
+     332
+    ],
+    [
+     302,
+     332
+    ],
+    [
+     302,
+     396
+    ],
+    [
+     328,
+     396
+    ]
+   ],
+   "arrow": false,
+   "labelBox": null
+  },
+  {
+   "id": "repo->infra",
+   "from": "repo",
+   "to": "infra",
+   "kind": "weak",
+   "points": [
+    [
+     124,
+     332
+    ],
+    [
+     142,
+     332
+    ],
+    [
+     142,
+     462
+    ],
+    [
+     180,
+     462
+    ]
+   ],
+   "arrow": false,
+   "labelBox": null
+  },
+  {
+   "id": "infra->terraform",
+   "from": "infra",
+   "to": "terraform",
+   "kind": "weak",
+   "points": [
+    [
+     272,
+     462
+    ],
+    [
+     328,
+     462
+    ]
+   ],
+   "arrow": false,
+   "labelBox": null
+  }
+ ],
+ "lines": [],
+ "bars": [],
+ "flows": [],
+ "brief": null,
+ "facts": {},
+ "draft": false,
+ "requireSources": false,
+ "icons": {
+  "folder-git-2": [
+   [
+    "path",
+    {
+     "d": "M18 19a5 5 0 0 1-5-5v8"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M9 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v5"
+    }
+   ],
+   [
+    "circle",
+    {
+     "cx": "13",
+     "cy": "12",
+     "r": "2"
+    }
+   ],
+   [
+    "circle",
+    {
+     "cx": "20",
+     "cy": "19",
+     "r": "2"
+    }
+   ]
+  ],
+  "folder": [
+   [
+    "path",
+    {
+     "d": "M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+    }
+   ]
+  ]
+ },
+ "width": 452,
+ "height": 514
+}

@@ -1,0 +1,46 @@
+kind: sequence
+title: "Payments: card authorization"
+subtitle: The saga behind step 4 of the overview
+brief: ./payments-brief.md
+participants:
+  - {id: merchant, label: Merchant, icon: store}
+  - {id: api, label: Payments API, icon: server, facts: [F1]}
+  - {id: saga, label: Orchestrator, icon: workflow, facts: [F4]}
+  - {id: risk, label: Risk, icon: shield-check, facts: [F10, D5]}
+  - {id: vault, label: Card vault, icon: lock, facts: [F7, D1]}
+  - {id: acquirer, label: Acquirer, icon: landmark, facts: [F2]}
+  - {id: ledger, label: Ledger, icon: book-open, facts: [F6, D4]}
+messages:
+  - {from: merchant, to: api, label: "POST /payments", kind: sync, about: Carries an Idempotency-Key header., facts: [F1]}
+  - "api -> saga: start(payment)"
+  - "saga -> risk: score"
+  - "risk --> saga: 0.12"
+  - block: alt
+    label: score below threshold
+    messages:
+      - "saga -> vault: authorize(token)"
+      - {from: vault, to: acquirer, label: "authorize(card)", kind: sync, facts: [F2]}
+      - "acquirer --> vault: approved | declined"
+      - "vault --> saga: result"
+      - block: alt
+        label: approved
+        messages:
+          - {from: saga, to: ledger, label: "post entries", kind: sync, facts: [F6]}
+          - "ledger --> saga: ok | failed"
+          - block: opt
+            label: ledger write fails
+            messages:
+              - {from: saga, to: vault, label: "void(auth)", kind: sync, about: "Compensation: undoes the authorization.", facts: [F4]}
+              - "vault --> saga: voided"
+        else:
+          - label: declined
+            messages:
+              - "saga -> saga: mark failed"
+    else:
+      - label: too risky
+        messages:
+          - "saga -> saga: mark blocked"
+  - note: State and outbox row commit in one transaction.
+    over: [saga]
+  - "saga --> api: result"
+  - "api --> merchant: 201 + status"

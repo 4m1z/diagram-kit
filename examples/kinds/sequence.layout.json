@@ -1,0 +1,600 @@
+{
+ "version": 1,
+ "kind": "sequence",
+ "engine": "sequence",
+ "title": "Sign in with a passkey",
+ "subtitle": "",
+ "direction": null,
+ "numbered": true,
+ "theme": {},
+ "nodes": [
+  {
+   "id": "user",
+   "label": "User",
+   "icon": "user",
+   "shape": "box",
+   "role": "participant",
+   "x": 104.559,
+   "y": 64,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "User"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "app",
+   "label": "Web app",
+   "icon": "app-window",
+   "shape": "box",
+   "role": "participant",
+   "x": 267.55899999999997,
+   "y": 64,
+   "w": 112,
+   "h": 40,
+   "lines": [
+    "Web app"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "auth",
+   "label": "Auth API",
+   "icon": "key-round",
+   "shape": "box",
+   "role": "participant",
+   "x": 449.55899999999997,
+   "y": 64,
+   "w": 108,
+   "h": 40,
+   "lines": [
+    "Auth API"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "db",
+   "label": "Users DB",
+   "icon": "database",
+   "shape": "box",
+   "role": "participant",
+   "x": 614.559,
+   "y": 64,
+   "w": 112,
+   "h": 40,
+   "lines": [
+    "Users DB"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "note-4",
+   "label": "The private key never leaves the device.",
+   "lines": [
+    "The private key never leaves the device."
+   ],
+   "shape": "note",
+   "role": "note",
+   "x": 32,
+   "y": 594,
+   "w": 237.118,
+   "h": 32
+  }
+ ],
+ "groups": [
+  {
+   "id": "block-1",
+   "variant": "fragment",
+   "tag": "alt",
+   "tagW": 40,
+   "label": "signature valid",
+   "labelW": 102.5,
+   "x": 267.55899999999997,
+   "y": 428,
+   "w": 276,
+   "h": 152,
+   "depth": 0
+  }
+ ],
+ "edges": [
+  {
+   "id": "m1",
+   "from": "user",
+   "to": "app",
+   "kind": "sync",
+   "label": "Sign in",
+   "points": [
+    [
+     150.559,
+     160
+    ],
+    [
+     318.55899999999997,
+     160
+    ]
+   ],
+   "labelBox": {
+    "x": 216.059,
+    "y": 139,
+    "w": 55,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 1,
+     "x": 205.059,
+     "y": 147
+    }
+   ]
+  },
+  {
+   "id": "m2",
+   "from": "app",
+   "to": "auth",
+   "kind": "sync",
+   "label": "begin(challenge)",
+   "points": [
+    [
+     328.55899999999997,
+     202
+    ],
+    [
+     498.55899999999997,
+     202
+    ]
+   ],
+   "labelBox": {
+    "x": 367.05899999999997,
+    "y": 181,
+    "w": 111,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 2,
+     "x": 356.05899999999997,
+     "y": 189
+    }
+   ]
+  },
+  {
+   "id": "m3",
+   "from": "auth",
+   "to": "app",
+   "kind": "return",
+   "label": "options",
+   "points": [
+    [
+     498.55899999999997,
+     244
+    ],
+    [
+     328.55899999999997,
+     244
+    ]
+   ],
+   "labelBox": {
+    "x": 395.05899999999997,
+    "y": 223,
+    "w": 55,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 3,
+     "x": 384.05899999999997,
+     "y": 231
+    }
+   ]
+  },
+  {
+   "id": "m4",
+   "from": "app",
+   "to": "user",
+   "kind": "sync",
+   "label": "Touch ID prompt",
+   "points": [
+    [
+     318.55899999999997,
+     286
+    ],
+    [
+     155.559,
+     286
+    ]
+   ],
+   "labelBox": {
+    "x": 193.559,
+    "y": 265,
+    "w": 105,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 4,
+     "x": 182.559,
+     "y": 273
+    }
+   ]
+  },
+  {
+   "id": "m5",
+   "from": "user",
+   "to": "app",
+   "kind": "return",
+   "label": "signed assertion",
+   "points": [
+    [
+     155.559,
+     328
+    ],
+    [
+     318.55899999999997,
+     328
+    ]
+   ],
+   "labelBox": {
+    "x": 190.559,
+    "y": 307,
+    "w": 111,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 5,
+     "x": 179.559,
+     "y": 315
+    }
+   ]
+  },
+  {
+   "id": "m6",
+   "from": "app",
+   "to": "auth",
+   "kind": "sync",
+   "label": "verify(assertion)",
+   "points": [
+    [
+     328.55899999999997,
+     370
+    ],
+    [
+     498.55899999999997,
+     370
+    ]
+   ],
+   "labelBox": {
+    "x": 363.55899999999997,
+    "y": 349,
+    "w": 118,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 6,
+     "x": 352.55899999999997,
+     "y": 357
+    }
+   ]
+  },
+  {
+   "id": "m7",
+   "from": "auth",
+   "to": "db",
+   "kind": "data",
+   "label": "load credential",
+   "points": [
+    [
+     508.55899999999997,
+     412
+    ],
+    [
+     670.559,
+     412
+    ]
+   ],
+   "labelBox": {
+    "x": 546.059,
+    "y": 391,
+    "w": 105,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 7,
+     "x": 535.059,
+     "y": 399
+    }
+   ]
+  },
+  {
+   "id": "m8",
+   "from": "auth",
+   "to": "app",
+   "kind": "return",
+   "label": "session cookie",
+   "points": [
+    [
+     498.55899999999997,
+     486
+    ],
+    [
+     328.55899999999997,
+     486
+    ]
+   ],
+   "labelBox": {
+    "x": 373.05899999999997,
+    "y": 465,
+    "w": 99,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 8,
+     "x": 362.05899999999997,
+     "y": 473
+    }
+   ]
+  },
+  {
+   "id": "m9",
+   "from": "auth",
+   "to": "app",
+   "kind": "return",
+   "label": "401",
+   "points": [
+    [
+     498.55899999999997,
+     556
+    ],
+    [
+     328.55899999999997,
+     556
+    ]
+   ],
+   "labelBox": {
+    "x": 408.05899999999997,
+    "y": 535,
+    "w": 29,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 9,
+     "x": 397.05899999999997,
+     "y": 543
+    }
+   ]
+  }
+ ],
+ "lines": [
+  {
+   "id": "db",
+   "kind": "lifeline",
+   "x1": 670.559,
+   "y1": 104,
+   "x2": 670.559,
+   "y2": 652
+  },
+  {
+   "id": "auth",
+   "kind": "lifeline",
+   "x1": 503.55899999999997,
+   "y1": 104,
+   "x2": 503.55899999999997,
+   "y2": 652
+  },
+  {
+   "id": "app",
+   "kind": "lifeline",
+   "x1": 323.55899999999997,
+   "y1": 104,
+   "x2": 323.55899999999997,
+   "y2": 652
+  },
+  {
+   "id": "user",
+   "kind": "lifeline",
+   "x1": 150.559,
+   "y1": 104,
+   "x2": 150.559,
+   "y2": 652
+  },
+  {
+   "kind": "divider",
+   "x1": 267.55899999999997,
+   "y1": 506,
+   "x2": 543.559,
+   "y2": 506,
+   "label": "[invalid]",
+   "labelW": 64.7
+  }
+ ],
+ "bars": [
+  {
+   "owner": "auth",
+   "x": 498.55899999999997,
+   "y": 202,
+   "w": 10,
+   "h": 42
+  },
+  {
+   "owner": "user",
+   "x": 145.559,
+   "y": 286,
+   "w": 10,
+   "h": 42
+  },
+  {
+   "owner": "auth",
+   "x": 498.55899999999997,
+   "y": 370,
+   "w": 10,
+   "h": 116
+  },
+  {
+   "owner": "auth",
+   "x": 498.55899999999997,
+   "y": 370,
+   "w": 10,
+   "h": 186
+  },
+  {
+   "owner": "app",
+   "x": 318.55899999999997,
+   "y": 160,
+   "w": 10,
+   "h": 486
+  }
+ ],
+ "flows": [
+  {
+   "id": "sequence",
+   "label": "Sign in with a passkey",
+   "primary": true,
+   "steps": [
+    {
+     "edge": "m1",
+     "text": "Sign in"
+    },
+    {
+     "edge": "m2",
+     "text": "begin(challenge)"
+    },
+    {
+     "edge": "m3",
+     "text": "options"
+    },
+    {
+     "edge": "m4",
+     "text": "Touch ID prompt"
+    },
+    {
+     "edge": "m5",
+     "text": "signed assertion"
+    },
+    {
+     "edge": "m6",
+     "text": "verify(assertion)"
+    },
+    {
+     "edge": "m7",
+     "text": "load credential"
+    },
+    {
+     "edge": "m8",
+     "text": "session cookie"
+    },
+    {
+     "edge": "m9",
+     "text": "401"
+    }
+   ]
+  }
+ ],
+ "brief": null,
+ "facts": {},
+ "draft": false,
+ "requireSources": false,
+ "icons": {
+  "user": [
+   [
+    "path",
+    {
+     "d": "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+    }
+   ],
+   [
+    "circle",
+    {
+     "cx": "12",
+     "cy": "7",
+     "r": "4"
+    }
+   ]
+  ],
+  "app-window": [
+   [
+    "rect",
+    {
+     "x": "2",
+     "y": "4",
+     "width": "20",
+     "height": "16",
+     "rx": "2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M10 4v4"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M2 8h20"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M6 4v4"
+    }
+   ]
+  ],
+  "key-round": [
+   [
+    "path",
+    {
+     "d": "M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"
+    }
+   ],
+   [
+    "circle",
+    {
+     "cx": "16.5",
+     "cy": "7.5",
+     "r": ".5",
+     "fill": "currentColor"
+    }
+   ]
+  ],
+  "database": [
+   [
+    "ellipse",
+    {
+     "cx": "12",
+     "cy": "5",
+     "rx": "9",
+     "ry": "3"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M3 5V19A9 3 0 0 0 21 19V5"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M3 12A9 3 0 0 0 21 12"
+    }
+   ]
+  ]
+ },
+ "width": 759,
+ "height": 684
+}

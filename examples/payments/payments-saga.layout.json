@@ -1,0 +1,1219 @@
+{
+ "version": 1,
+ "kind": "sequence",
+ "engine": "sequence",
+ "title": "Payments: card authorization",
+ "subtitle": "The saga behind step 4 of the overview",
+ "direction": null,
+ "numbered": true,
+ "theme": {},
+ "nodes": [
+  {
+   "id": "merchant",
+   "label": "Merchant",
+   "icon": "store",
+   "shape": "box",
+   "role": "participant",
+   "x": 32,
+   "y": 80,
+   "w": 116,
+   "h": 40,
+   "lines": [
+    "Merchant"
+   ],
+   "subLines": []
+  },
+  {
+   "id": "api",
+   "label": "Payments API",
+   "icon": "server",
+   "shape": "box",
+   "role": "participant",
+   "x": 204,
+   "y": 80,
+   "w": 144,
+   "h": 40,
+   "lines": [
+    "Payments API"
+   ],
+   "subLines": [],
+   "facts": [
+    "F1"
+   ]
+  },
+  {
+   "id": "saga",
+   "label": "Orchestrator",
+   "icon": "workflow",
+   "shape": "box",
+   "role": "participant",
+   "x": 404,
+   "y": 80,
+   "w": 136,
+   "h": 40,
+   "lines": [
+    "Orchestrator"
+   ],
+   "subLines": [],
+   "facts": [
+    "F4"
+   ]
+  },
+  {
+   "id": "risk",
+   "label": "Risk",
+   "icon": "shield-check",
+   "shape": "box",
+   "role": "participant",
+   "x": 602,
+   "y": 80,
+   "w": 92,
+   "h": 40,
+   "lines": [
+    "Risk"
+   ],
+   "subLines": [],
+   "facts": [
+    "F10",
+    "D5"
+   ]
+  },
+  {
+   "id": "vault",
+   "label": "Card vault",
+   "icon": "lock",
+   "shape": "box",
+   "role": "participant",
+   "x": 750,
+   "y": 80,
+   "w": 120,
+   "h": 40,
+   "lines": [
+    "Card vault"
+   ],
+   "subLines": [],
+   "facts": [
+    "F7",
+    "D1"
+   ]
+  },
+  {
+   "id": "acquirer",
+   "label": "Acquirer",
+   "icon": "landmark",
+   "shape": "box",
+   "role": "participant",
+   "x": 948,
+   "y": 80,
+   "w": 108,
+   "h": 40,
+   "lines": [
+    "Acquirer"
+   ],
+   "subLines": [],
+   "facts": [
+    "F2"
+   ]
+  },
+  {
+   "id": "ledger",
+   "label": "Ledger",
+   "icon": "book-open",
+   "shape": "box",
+   "role": "participant",
+   "x": 1112,
+   "y": 80,
+   "w": 100,
+   "h": 40,
+   "lines": [
+    "Ledger"
+   ],
+   "subLines": [],
+   "facts": [
+    "F6",
+    "D4"
+   ]
+  },
+  {
+   "id": "note-7",
+   "label": "State and outbox row commit in one transaction.",
+   "lines": [
+    "State and outbox row commit in one",
+    "transaction."
+   ],
+   "shape": "note",
+   "role": "note",
+   "x": 362.96299999999997,
+   "y": 980,
+   "w": 218.074,
+   "h": 48
+  }
+ ],
+ "groups": [
+  {
+   "id": "block-1",
+   "variant": "fragment",
+   "tag": "opt",
+   "tagW": 40,
+   "label": "ledger write fails",
+   "labelW": 121.4,
+   "x": 436,
+   "y": 634,
+   "w": 394,
+   "h": 124,
+   "depth": 2
+  },
+  {
+   "id": "block-2",
+   "variant": "fragment",
+   "tag": "alt",
+   "tagW": 40,
+   "label": "approved",
+   "labelW": 58.4,
+   "x": 426,
+   "y": 518,
+   "w": 766,
+   "h": 344,
+   "depth": 1
+  },
+  {
+   "id": "block-3",
+   "variant": "fragment",
+   "tag": "alt",
+   "tagW": 40,
+   "label": "score below threshold",
+   "labelW": 140.29999999999998,
+   "x": 416,
+   "y": 318,
+   "w": 786,
+   "h": 648,
+   "depth": 0
+  }
+ ],
+ "edges": [
+  {
+   "id": "m1",
+   "from": "merchant",
+   "to": "api",
+   "kind": "sync",
+   "label": "POST /payments",
+   "points": [
+    [
+     90,
+     176
+    ],
+    [
+     271,
+     176
+    ]
+   ],
+   "labelBox": {
+    "x": 140,
+    "y": 155,
+    "w": 99,
+    "h": 16
+   },
+   "about": "Carries an Idempotency-Key header.",
+   "facts": [
+    "F1"
+   ],
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 1,
+     "x": 129,
+     "y": 163
+    }
+   ]
+  },
+  {
+   "id": "m2",
+   "from": "api",
+   "to": "saga",
+   "kind": "sync",
+   "label": "start(payment)",
+   "points": [
+    [
+     281,
+     218
+    ],
+    [
+     467,
+     218
+    ]
+   ],
+   "labelBox": {
+    "x": 333.5,
+    "y": 197,
+    "w": 99,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 2,
+     "x": 322.5,
+     "y": 205
+    }
+   ]
+  },
+  {
+   "id": "m3",
+   "from": "saga",
+   "to": "risk",
+   "kind": "sync",
+   "label": "score",
+   "points": [
+    [
+     477,
+     260
+    ],
+    [
+     643,
+     260
+    ]
+   ],
+   "labelBox": {
+    "x": 548,
+    "y": 239,
+    "w": 42,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 3,
+     "x": 537,
+     "y": 247
+    }
+   ]
+  },
+  {
+   "id": "m4",
+   "from": "risk",
+   "to": "saga",
+   "kind": "return",
+   "label": "0.12",
+   "points": [
+    [
+     643,
+     302
+    ],
+    [
+     477,
+     302
+    ]
+   ],
+   "labelBox": {
+    "x": 551,
+    "y": 281,
+    "w": 36,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 4,
+     "x": 540,
+     "y": 289
+    }
+   ]
+  },
+  {
+   "id": "m5",
+   "from": "saga",
+   "to": "vault",
+   "kind": "sync",
+   "label": "authorize(token)",
+   "points": [
+    [
+     477,
+     376
+    ],
+    [
+     805,
+     376
+    ]
+   ],
+   "labelBox": {
+    "x": 594.5,
+    "y": 355,
+    "w": 111,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 5,
+     "x": 583.5,
+     "y": 363
+    }
+   ]
+  },
+  {
+   "id": "m6",
+   "from": "vault",
+   "to": "acquirer",
+   "kind": "sync",
+   "label": "authorize(card)",
+   "points": [
+    [
+     815,
+     418
+    ],
+    [
+     997,
+     418
+    ]
+   ],
+   "labelBox": {
+    "x": 862.5,
+    "y": 397,
+    "w": 105,
+    "h": 16
+   },
+   "facts": [
+    "F2"
+   ],
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 6,
+     "x": 851.5,
+     "y": 405
+    }
+   ]
+  },
+  {
+   "id": "m7",
+   "from": "acquirer",
+   "to": "vault",
+   "kind": "return",
+   "label": "approved | declined",
+   "points": [
+    [
+     997,
+     460
+    ],
+    [
+     815,
+     460
+    ]
+   ],
+   "labelBox": {
+    "x": 850,
+    "y": 439,
+    "w": 130,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 7,
+     "x": 839,
+     "y": 447
+    }
+   ]
+  },
+  {
+   "id": "m8",
+   "from": "vault",
+   "to": "saga",
+   "kind": "return",
+   "label": "result",
+   "points": [
+    [
+     805,
+     502
+    ],
+    [
+     477,
+     502
+    ]
+   ],
+   "labelBox": {
+    "x": 626,
+    "y": 481,
+    "w": 48,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 8,
+     "x": 615,
+     "y": 489
+    }
+   ]
+  },
+  {
+   "id": "m9",
+   "from": "saga",
+   "to": "ledger",
+   "kind": "sync",
+   "label": "post entries",
+   "points": [
+    [
+     477,
+     576
+    ],
+    [
+     1157,
+     576
+    ]
+   ],
+   "labelBox": {
+    "x": 783,
+    "y": 555,
+    "w": 86,
+    "h": 16
+   },
+   "facts": [
+    "F6"
+   ],
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 9,
+     "x": 772,
+     "y": 563
+    }
+   ]
+  },
+  {
+   "id": "m10",
+   "from": "ledger",
+   "to": "saga",
+   "kind": "return",
+   "label": "ok | failed",
+   "points": [
+    [
+     1157,
+     618
+    ],
+    [
+     477,
+     618
+    ]
+   ],
+   "labelBox": {
+    "x": 786,
+    "y": 597,
+    "w": 80,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 10,
+     "x": 775,
+     "y": 605
+    }
+   ]
+  },
+  {
+   "id": "m11",
+   "from": "saga",
+   "to": "vault",
+   "kind": "sync",
+   "label": "void(auth)",
+   "points": [
+    [
+     477,
+     692
+    ],
+    [
+     805,
+     692
+    ]
+   ],
+   "labelBox": {
+    "x": 613.5,
+    "y": 671,
+    "w": 73,
+    "h": 16
+   },
+   "about": "Compensation: undoes the authorization.",
+   "facts": [
+    "F4"
+   ],
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 11,
+     "x": 602.5,
+     "y": 679
+    }
+   ]
+  },
+  {
+   "id": "m12",
+   "from": "vault",
+   "to": "saga",
+   "kind": "return",
+   "label": "voided",
+   "points": [
+    [
+     805,
+     734
+    ],
+    [
+     477,
+     734
+    ]
+   ],
+   "labelBox": {
+    "x": 626,
+    "y": 713,
+    "w": 48,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 12,
+     "x": 615,
+     "y": 721
+    }
+   ]
+  },
+  {
+   "id": "m13",
+   "from": "saga",
+   "to": "saga",
+   "kind": "sync",
+   "label": "mark failed",
+   "points": [
+    [
+     467,
+     814
+    ],
+    [
+     501,
+     814
+    ],
+    [
+     501,
+     832
+    ],
+    [
+     477,
+     832
+    ]
+   ],
+   "labelBox": {
+    "x": 529,
+    "y": 814,
+    "w": 80,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 13,
+     "x": 518,
+     "y": 822
+    }
+   ]
+  },
+  {
+   "id": "m14",
+   "from": "saga",
+   "to": "saga",
+   "kind": "sync",
+   "label": "mark blocked",
+   "points": [
+    [
+     467,
+     918
+    ],
+    [
+     501,
+     918
+    ],
+    [
+     501,
+     936
+    ],
+    [
+     477,
+     936
+    ]
+   ],
+   "labelBox": {
+    "x": 529,
+    "y": 918,
+    "w": 86,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 14,
+     "x": 518,
+     "y": 926
+    }
+   ]
+  },
+  {
+   "id": "m15",
+   "from": "saga",
+   "to": "api",
+   "kind": "return",
+   "label": "result",
+   "points": [
+    [
+     467,
+     1068
+    ],
+    [
+     281,
+     1068
+    ]
+   ],
+   "labelBox": {
+    "x": 359,
+    "y": 1047,
+    "w": 48,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 15,
+     "x": 348,
+     "y": 1055
+    }
+   ]
+  },
+  {
+   "id": "m16",
+   "from": "api",
+   "to": "merchant",
+   "kind": "return",
+   "label": "201 + status",
+   "points": [
+    [
+     271,
+     1110
+    ],
+    [
+     90,
+     1110
+    ]
+   ],
+   "labelBox": {
+    "x": 146.5,
+    "y": 1089,
+    "w": 86,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "sequence",
+     "step": 16,
+     "x": 135.5,
+     "y": 1097
+    }
+   ]
+  }
+ ],
+ "lines": [
+  {
+   "id": "ledger",
+   "kind": "lifeline",
+   "x1": 1162,
+   "y1": 120,
+   "x2": 1162,
+   "y2": 1138
+  },
+  {
+   "id": "acquirer",
+   "kind": "lifeline",
+   "x1": 1002,
+   "y1": 120,
+   "x2": 1002,
+   "y2": 1138
+  },
+  {
+   "id": "vault",
+   "kind": "lifeline",
+   "x1": 810,
+   "y1": 120,
+   "x2": 810,
+   "y2": 1138
+  },
+  {
+   "id": "risk",
+   "kind": "lifeline",
+   "x1": 648,
+   "y1": 120,
+   "x2": 648,
+   "y2": 1138
+  },
+  {
+   "id": "saga",
+   "kind": "lifeline",
+   "x1": 472,
+   "y1": 120,
+   "x2": 472,
+   "y2": 1138
+  },
+  {
+   "id": "api",
+   "kind": "lifeline",
+   "x1": 276,
+   "y1": 120,
+   "x2": 276,
+   "y2": 1138
+  },
+  {
+   "id": "merchant",
+   "kind": "lifeline",
+   "x1": 90,
+   "y1": 120,
+   "x2": 90,
+   "y2": 1138
+  },
+  {
+   "kind": "divider",
+   "x1": 426,
+   "y1": 772,
+   "x2": 1192,
+   "y2": 772,
+   "label": "[declined]",
+   "labelW": 71
+  },
+  {
+   "kind": "divider",
+   "x1": 416,
+   "y1": 876,
+   "x2": 1202,
+   "y2": 876,
+   "label": "[too risky]",
+   "labelW": 77.3
+  }
+ ],
+ "bars": [
+  {
+   "owner": "risk",
+   "x": 643,
+   "y": 260,
+   "w": 10,
+   "h": 42
+  },
+  {
+   "owner": "acquirer",
+   "x": 997,
+   "y": 418,
+   "w": 10,
+   "h": 42
+  },
+  {
+   "owner": "vault",
+   "x": 805,
+   "y": 376,
+   "w": 10,
+   "h": 126
+  },
+  {
+   "owner": "ledger",
+   "x": 1157,
+   "y": 576,
+   "w": 10,
+   "h": 42
+  },
+  {
+   "owner": "vault",
+   "x": 805,
+   "y": 692,
+   "w": 10,
+   "h": 42
+  },
+  {
+   "owner": "saga",
+   "x": 467,
+   "y": 218,
+   "w": 10,
+   "h": 850
+  },
+  {
+   "owner": "api",
+   "x": 271,
+   "y": 176,
+   "w": 10,
+   "h": 934
+  }
+ ],
+ "flows": [
+  {
+   "id": "sequence",
+   "label": "Payments: card authorization",
+   "primary": true,
+   "steps": [
+    {
+     "edge": "m1",
+     "text": "POST /payments"
+    },
+    {
+     "edge": "m2",
+     "text": "start(payment)"
+    },
+    {
+     "edge": "m3",
+     "text": "score"
+    },
+    {
+     "edge": "m4",
+     "text": "0.12"
+    },
+    {
+     "edge": "m5",
+     "text": "authorize(token)"
+    },
+    {
+     "edge": "m6",
+     "text": "authorize(card)"
+    },
+    {
+     "edge": "m7",
+     "text": "approved | declined"
+    },
+    {
+     "edge": "m8",
+     "text": "result"
+    },
+    {
+     "edge": "m9",
+     "text": "post entries"
+    },
+    {
+     "edge": "m10",
+     "text": "ok | failed"
+    },
+    {
+     "edge": "m11",
+     "text": "void(auth)"
+    },
+    {
+     "edge": "m12",
+     "text": "voided"
+    },
+    {
+     "edge": "m13",
+     "text": "mark failed"
+    },
+    {
+     "edge": "m14",
+     "text": "mark blocked"
+    },
+    {
+     "edge": "m15",
+     "text": "result"
+    },
+    {
+     "edge": "m16",
+     "text": "201 + status"
+    }
+   ]
+  }
+ ],
+ "brief": {
+  "status": "approved",
+  "file": "payments-brief.md"
+ },
+ "facts": {
+  "F1": {
+   "kind": "fact",
+   "text": "In Stripe API v1, retrying a POST with the same Idempotency-Key returns the saved status code and body of the first request, including 500 errors, and keys may be pruned once they are at least 24 hours old.",
+   "sources": [
+    "https://docs.stripe.com/api/idempotent_requests"
+   ],
+   "checked": "2026-11-17"
+  },
+  "F2": {
+   "kind": "fact",
+   "text": "Card payments can be authorized first and captured later; an online card authorization is usually valid for 7 days, after which the funds are released.",
+   "sources": [
+    "https://docs.stripe.com/payments/place-a-hold-on-a-payment-method"
+   ],
+   "checked": "2026-11-17"
+  },
+  "F3": {
+   "kind": "fact",
+   "text": "With a transactional outbox, the service writes the business change and the outgoing message in the same database transaction, and a separate relay publishes the message; the relay may publish a message more than once.",
+   "sources": [
+    "https://microservices.io/patterns/data/transactional-outbox.html"
+   ]
+  },
+  "F4": {
+   "kind": "fact",
+   "text": "A saga is a coordinated sequence of local transactions; when a step fails, compensating transactions undo the changes of the steps already completed.",
+   "sources": [
+    "https://microservices.io/patterns/data/saga.html"
+   ]
+  },
+  "F5": {
+   "kind": "fact",
+   "text": "Debezium's PostgreSQL connector captures row-level changes from PostgreSQL's logical decoding of the write-ahead log, and its outbox event router turns outbox rows into events.",
+   "sources": [
+    "https://debezium.io/documentation/reference/stable/connectors/postgresql.html",
+    "https://debezium.io/documentation/reference/stable/transformations/outbox-event-router.html"
+   ]
+  },
+  "F6": {
+   "kind": "fact",
+   "text": "In a double-entry ledger every transaction has at least two entries, and its total debits equal its total credits.",
+   "sources": [
+    "https://www.moderntreasury.com/journal/accounting-for-developers-part-i"
+   ]
+  },
+  "F7": {
+   "kind": "fact",
+   "text": "Tokenizing card details in the browser sends them directly to the payment provider without touching the merchant's servers, which reduces but does not remove PCI DSS obligations.",
+   "sources": [
+    "https://docs.stripe.com/security/guide",
+    "https://listings.pcisecuritystandards.org/documents/Tokenization_Guidelines_Info_Supplement.pdf"
+   ]
+  },
+  "F8": {
+   "kind": "fact",
+   "text": "Stripe retries undelivered webhook events with exponential backoff for up to three days in live mode and does not guarantee event order.",
+   "sources": [
+    "https://docs.stripe.com/webhooks"
+   ],
+   "checked": "2026-11-17"
+  },
+  "F9": {
+   "kind": "fact",
+   "text": "Kafka consumers read a partition's records in exactly the order they were written; the guarantee is per partition.",
+   "sources": [
+    "https://kafka.apache.org/44/getting-started/introduction/"
+   ]
+  },
+  "F10": {
+   "kind": "fact",
+   "text": "Stripe Radar scores each payment's fraud risk in real time and blocks high-risk payments by default before they reach the card network.",
+   "sources": [
+    "https://docs.stripe.com/radar/transaction-risk-prevention"
+   ],
+   "checked": "2026-11-17"
+  },
+  "D1": {
+   "kind": "decision",
+   "text": "Only the card vault, inside its own PCI zone, ever sees a card number; everything else handles tokens (F7).",
+   "sources": []
+  },
+  "D2": {
+   "kind": "decision",
+   "text": "State changes leave the payment core only through the outbox, never by publishing directly (F3, F5).",
+   "sources": []
+  },
+  "D3": {
+   "kind": "decision",
+   "text": "Events are keyed by payment id so one payment's events stay in order (F9); webhook consumers must still handle duplicates and reordering (F3, F8).",
+   "sources": []
+  },
+  "D4": {
+   "kind": "decision",
+   "text": "Every money movement becomes balanced ledger entries (F6); a failed ledger write voids the authorization as a compensation (F4).",
+   "sources": []
+  },
+  "D5": {
+   "kind": "decision",
+   "text": "Risk is scored before authorization, so blocked payments never reach the card network (F10).",
+   "sources": []
+  },
+  "A1": {
+   "kind": "assumption",
+   "text": "The reconciler runs daily; the cadence is an assumption to confirm.",
+   "sources": []
+  },
+  "A2": {
+   "kind": "assumption",
+   "text": "Stripe behaviour stands in for \"a typical card processor\"; other processors differ in limits.",
+   "sources": []
+  }
+ },
+ "draft": false,
+ "requireSources": true,
+ "icons": {
+  "store": [
+   [
+    "path",
+    {
+     "d": "M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"
+    }
+   ]
+  ],
+  "server": [
+   [
+    "rect",
+    {
+     "width": "20",
+     "height": "8",
+     "x": "2",
+     "y": "2",
+     "rx": "2",
+     "ry": "2"
+    }
+   ],
+   [
+    "rect",
+    {
+     "width": "20",
+     "height": "8",
+     "x": "2",
+     "y": "14",
+     "rx": "2",
+     "ry": "2"
+    }
+   ],
+   [
+    "line",
+    {
+     "x1": "6",
+     "x2": "6.01",
+     "y1": "6",
+     "y2": "6"
+    }
+   ],
+   [
+    "line",
+    {
+     "x1": "6",
+     "x2": "6.01",
+     "y1": "18",
+     "y2": "18"
+    }
+   ]
+  ],
+  "workflow": [
+   [
+    "rect",
+    {
+     "width": "8",
+     "height": "8",
+     "x": "3",
+     "y": "3",
+     "rx": "2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M7 11v4a2 2 0 0 0 2 2h4"
+    }
+   ],
+   [
+    "rect",
+    {
+     "width": "8",
+     "height": "8",
+     "x": "13",
+     "y": "13",
+     "rx": "2"
+    }
+   ]
+  ],
+  "shield-check": [
+   [
+    "path",
+    {
+     "d": "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "m9 12 2 2 4-4"
+    }
+   ]
+  ],
+  "lock": [
+   [
+    "rect",
+    {
+     "width": "18",
+     "height": "11",
+     "x": "3",
+     "y": "11",
+     "rx": "2",
+     "ry": "2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M7 11V7a5 5 0 0 1 10 0v4"
+    }
+   ]
+  ],
+  "landmark": [
+   [
+    "path",
+    {
+     "d": "M10 18v-7"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M14 18v-7"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M18 18v-7"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M3 22h18"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M6 18v-7"
+    }
+   ]
+  ],
+  "book-open": [
+   [
+    "path",
+    {
+     "d": "M12 5v16"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"
+    }
+   ]
+  ]
+ },
+ "width": 1244,
+ "height": 1170
+}
