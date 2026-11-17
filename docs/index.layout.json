@@ -1,0 +1,511 @@
+{
+ "version": 1,
+ "kind": "architecture",
+ "engine": "graph",
+ "title": "diagram-kit",
+ "subtitle": "How it works",
+ "direction": "right",
+ "numbered": true,
+ "theme": {},
+ "nodes": [
+  {
+   "id": "you",
+   "label": "You",
+   "sub": "a question or a doc",
+   "icon": "user",
+   "shape": "box",
+   "x": 32,
+   "y": 186.66666666666666,
+   "w": 180,
+   "h": 56,
+   "lines": [
+    "You"
+   ],
+   "subLines": [
+    "a question or a doc"
+   ],
+   "about": "Ask for a diagram of a system, a flow or a document. Say where it should go, or the agent asks."
+  },
+  {
+   "id": "agent",
+   "label": "Claude Code",
+   "sub": "or Codex",
+   "icon": "bot",
+   "shape": "box",
+   "x": 389.3333333333333,
+   "y": 196,
+   "w": 136,
+   "h": 56,
+   "lines": [
+    "Claude Code"
+   ],
+   "subLines": [
+    "or Codex"
+   ],
+   "group": "agentg",
+   "about": "Reads the code or document, asks when something is unclear, and writes a spec: parts, tiers, groups and flows in reading order. No coordinates."
+  },
+  {
+   "id": "skill",
+   "label": "create-diagram",
+   "sub": "the skill",
+   "icon": "book-open",
+   "shape": "box",
+   "x": 384,
+   "y": 120,
+   "w": 152,
+   "h": 56,
+   "lines": [
+    "create-diagram"
+   ],
+   "subLines": [
+    "the skill"
+   ],
+   "group": "agentg",
+   "about": "Instructions and intuition: which kind and views to pick, which hints steer the layout, how to check the result and how to fit into your environment."
+  },
+  {
+   "id": "layout",
+   "label": "Layout",
+   "sub": "ELK.js",
+   "icon": "network",
+   "shape": "box",
+   "x": 778,
+   "y": 196,
+   "w": 100,
+   "h": 56,
+   "lines": [
+    "Layout"
+   ],
+   "subLines": [
+    "ELK.js"
+   ],
+   "group": "kitg",
+   "about": "ELK's layered algorithm places every part and routes every wire: columns in reading order, fewer crossings, right angles.",
+   "tone": "accent"
+  },
+  {
+   "id": "check",
+   "label": "Check",
+   "sub": "measures · previews",
+   "icon": "scan-search",
+   "shape": "box",
+   "x": 738,
+   "y": 272,
+   "w": 180,
+   "h": 56,
+   "lines": [
+    "Check"
+   ],
+   "subLines": [
+    "measures · previews"
+   ],
+   "group": "kitg",
+   "about": "Measures overlaps, crossings and backwards flow, and renders a PNG preview the agent looks at before delivering."
+  },
+  {
+   "id": "out",
+   "label": "Your medium",
+   "sub": "page · artifact · app",
+   "icon": "app-window",
+   "shape": "box",
+   "x": 1109,
+   "y": 196,
+   "w": 196,
+   "h": 56,
+   "lines": [
+    "Your medium"
+   ],
+   "subLines": [
+    "page · artifact · app"
+   ],
+   "about": "The diagram lands where you work and in your style: an interactive page, a claude.ai artifact, your own app or an image."
+  }
+ ],
+ "groups": [
+  {
+   "id": "agentg",
+   "label": "Your agent",
+   "x": 366,
+   "y": 80,
+   "w": 188,
+   "h": 190,
+   "depth": 0,
+   "about": "Claude Code or Codex with the create-diagram skill installed from the diagram-kit plugin."
+  },
+  {
+   "id": "kitg",
+   "label": "diagram-kit",
+   "x": 720,
+   "y": 156,
+   "w": 216,
+   "h": 190,
+   "depth": 0,
+   "about": "Scripts the agent runs. They own the geometry, so the agent never guesses coordinates."
+  }
+ ],
+ "edges": [
+  {
+   "id": "you->agent",
+   "from": "you",
+   "to": "agent",
+   "kind": "sync",
+   "label": "ask",
+   "points": [
+    [
+     212,
+     214.66666666666666
+    ],
+    [
+     389.3333333333333,
+     214.66666666666666
+    ]
+   ],
+   "labelBox": {
+    "x": 272,
+    "y": 219.66666666666666,
+    "w": 29,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "make-a-diagram",
+     "step": 1,
+     "x": 261,
+     "y": 227.66666666666666
+    }
+   ]
+  },
+  {
+   "id": "agent->layout",
+   "from": "agent",
+   "to": "layout",
+   "kind": "sync",
+   "label": "spec",
+   "points": [
+    [
+     525.3333333333334,
+     224
+    ],
+    [
+     778,
+     224
+    ]
+   ],
+   "labelBox": {
+    "x": 619,
+    "y": 203,
+    "w": 36,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "make-a-diagram",
+     "step": 2,
+     "x": 608,
+     "y": 211
+    }
+   ]
+  },
+  {
+   "id": "check->agent",
+   "from": "check",
+   "to": "agent",
+   "kind": "return",
+   "label": "fix",
+   "points": [
+    [
+     918,
+     300
+    ],
+    [
+     959,
+     300
+    ],
+    [
+     959,
+     362
+    ],
+    [
+     319,
+     362
+    ],
+    [
+     319,
+     233.33333333333331
+    ],
+    [
+     389.3333333333333,
+     233.33333333333331
+    ]
+   ],
+   "back": true,
+   "labelBox": {
+    "x": 622.5,
+    "y": 367,
+    "w": 29,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "make-a-diagram",
+     "step": 3,
+     "x": 611.5,
+     "y": 375
+    }
+   ]
+  },
+  {
+   "id": "layout->out",
+   "from": "layout",
+   "to": "out",
+   "kind": "sync",
+   "label": "render",
+   "points": [
+    [
+     878,
+     224
+    ],
+    [
+     1109,
+     224
+    ]
+   ],
+   "labelBox": {
+    "x": 1001,
+    "y": 229,
+    "w": 48,
+    "h": 16
+   },
+   "badges": [
+    {
+     "flow": "make-a-diagram",
+     "step": 4,
+     "x": 990,
+     "y": 237
+    }
+   ]
+  }
+ ],
+ "lines": [],
+ "bars": [],
+ "flows": [
+  {
+   "id": "make-a-diagram",
+   "label": "Make a diagram",
+   "primary": true,
+   "steps": [
+    {
+     "edge": "you->agent",
+     "text": "You ask for a diagram"
+    },
+    {
+     "edge": "agent->layout",
+     "text": "The agent writes a spec; ELK.js lays it out"
+    },
+    {
+     "edge": "check->agent",
+     "text": "The agent looks at the preview and fixes the spec"
+    },
+    {
+     "edge": "layout->out",
+     "text": "The diagram is rendered in your medium"
+    }
+   ]
+  }
+ ],
+ "brief": null,
+ "facts": {},
+ "draft": false,
+ "requireSources": false,
+ "icons": {
+  "user": [
+   [
+    "path",
+    {
+     "d": "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+    }
+   ],
+   [
+    "circle",
+    {
+     "cx": "12",
+     "cy": "7",
+     "r": "4"
+    }
+   ]
+  ],
+  "bot": [
+   [
+    "path",
+    {
+     "d": "M12 8V4H8"
+    }
+   ],
+   [
+    "rect",
+    {
+     "width": "16",
+     "height": "12",
+     "x": "4",
+     "y": "8",
+     "rx": "2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M2 14h2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M20 14h2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M15 13v2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M9 13v2"
+    }
+   ]
+  ],
+  "book-open": [
+   [
+    "path",
+    {
+     "d": "M12 5v16"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"
+    }
+   ]
+  ],
+  "network": [
+   [
+    "rect",
+    {
+     "x": "16",
+     "y": "16",
+     "width": "6",
+     "height": "6",
+     "rx": "1"
+    }
+   ],
+   [
+    "rect",
+    {
+     "x": "2",
+     "y": "16",
+     "width": "6",
+     "height": "6",
+     "rx": "1"
+    }
+   ],
+   [
+    "rect",
+    {
+     "x": "9",
+     "y": "2",
+     "width": "6",
+     "height": "6",
+     "rx": "1"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M12 12V8"
+    }
+   ]
+  ],
+  "scan-search": [
+   [
+    "path",
+    {
+     "d": "M3 7V5a2 2 0 0 1 2-2h2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M17 3h2a2 2 0 0 1 2 2v2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M21 17v2a2 2 0 0 1-2 2h-2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M7 21H5a2 2 0 0 1-2-2v-2"
+    }
+   ],
+   [
+    "circle",
+    {
+     "cx": "12",
+     "cy": "12",
+     "r": "3"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "m16 16-1.9-1.9"
+    }
+   ]
+  ],
+  "app-window": [
+   [
+    "rect",
+    {
+     "x": "2",
+     "y": "4",
+     "width": "20",
+     "height": "16",
+     "rx": "2"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M10 4v4"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M2 8h20"
+    }
+   ],
+   [
+    "path",
+    {
+     "d": "M6 4v4"
+    }
+   ]
+  ]
+ },
+ "width": 1337,
+ "height": 416
+}

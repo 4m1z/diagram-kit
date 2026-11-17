@@ -1,0 +1,26 @@
+# The diagram on GitHub Pages and in the README. Rebuild: node ../plugins/diagram-kit/skills/create-diagram/scripts/diagram.mjs build how-it-works.yaml --name index --dark
+kind: architecture
+title: diagram-kit
+subtitle: How it works
+groups:
+  - {id: agentg, label: Your agent, about: "Claude Code or Codex with the create-diagram skill installed from the diagram-kit plugin."}
+  - {id: kitg, label: diagram-kit, about: "Scripts the agent runs. They own the geometry, so the agent never guesses coordinates."}
+nodes:
+  - {id: you, label: You, sub: a question or a doc, icon: user, about: "Ask for a diagram of a system, a flow or a document. Say where it should go, or the agent asks."}
+  - {id: agent, label: Claude Code, sub: or Codex, icon: bot, group: agentg, about: "Reads the code or document, asks when something is unclear, and writes a spec: parts, tiers, groups and flows in reading order. No coordinates."}
+  - {id: skill, label: create-diagram, sub: the skill, icon: book-open, group: agentg, about: "Instructions and intuition: which kind and views to pick, which hints steer the layout, how to check the result and how to fit into your environment."}
+  - {id: layout, label: Layout, sub: ELK.js, icon: network, group: kitg, tone: accent, about: "ELK's layered algorithm places every part and routes every wire: columns in reading order, fewer crossings, right angles."}
+  - {id: check, label: Check, sub: "measures · previews", icon: scan-search, group: kitg, about: "Measures overlaps, crossings and backwards flow, and renders a PNG preview the agent looks at before delivering."}
+  - {id: out, label: Your medium, sub: page · artifact · app, icon: app-window, about: "The diagram lands where you work and in your style: an interactive page, a claude.ai artifact, your own app or an image."}
+edges:
+  - "you -> agent: ask"
+  - "agent -> layout: spec"
+  - {from: check, to: agent, label: fix, kind: return, back: true}
+  - "layout -> out: render"
+flows:
+  - label: Make a diagram
+    steps:
+      - {edge: "you -> agent", text: You ask for a diagram}
+      - {edge: "agent -> layout", text: The agent writes a spec; ELK.js lays it out}
+      - {edge: "check->agent", text: The agent looks at the preview and fixes the spec}
+      - {edge: "layout -> out", text: The diagram is rendered in your medium}

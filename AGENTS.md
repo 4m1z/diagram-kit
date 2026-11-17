@@ -18,6 +18,7 @@ plugins/diagram-kit/skills/create-diagram/agents/openai.yaml   Codex display met
 .claude-plugin/, .agents/plugins/                   marketplaces
 .agents/skills/create-diagram -> the skill (and .claude/skills -> .agents/skills) for dogfooding here
 examples/payments/      the showcase: brief, specs and built outputs
+docs/                   GitHub Pages: the how-it-works diagram (spec how-it-works.yaml, built index.html and the README images)
 tests/                  node:test suites
 ```
 
