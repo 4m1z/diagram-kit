@@ -56,6 +56,7 @@ nodes:
     tier: core              # optional; a part in a group sits in the group's column (a different tier is warned about)
     shape: box              # box | pill | diamond | note | text | start | end | table
     tone: accent            # optional emphasis: accent | blue | green | amber | red | violet | pink | cyan | slate
+    link: https://github.com/kieler/elkjs   # optional; a very small arrow in the top-right corner opens it in a new tab (http(s) only)
 edges:
   - "merchant -> gateway: POST /payments"   # sync call
   - "api ~> bus: PaymentAuthorized"          # async message
