@@ -6,6 +6,7 @@ sections:
   - heading: How it works
   - spec: how-it-works.yaml
     title: false
+    maxHeight: 880
   - heading: Install the plugin
     text: 'Then ask your agent for a diagram using `/create-diagram explain what you want`'
     install: true
