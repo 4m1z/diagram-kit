@@ -1,7 +1,7 @@
 {
   "name": "diagram-kit",
   "displayName": "Diagram Kit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Clear, well-positioned, interactive diagrams: architecture, flows, sequences, state machines, data models, trees and mind maps.",
   "author": { "name": "Alireza Sheikholmolouki" },
   "license": "MIT"
