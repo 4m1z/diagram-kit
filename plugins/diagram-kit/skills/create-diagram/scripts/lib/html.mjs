@@ -167,12 +167,13 @@ a { color: inherit; }
 .pg-icon { width: 36px; padding: 0; justify-content: center; color: var(--dk-muted); }
 .pg-tagline { margin: 0 0 28px; max-width: 680px; font-size: 17px; line-height: 1.55; color: var(--dk-muted); }
 .pg-tagline strong { color: var(--dk-text); font-weight: 500; }
-.pg-frame { position: relative; border: 1px solid var(--dk-border); border-radius: 14px; overflow: hidden; background: var(--dk-bg); }
+.pg-frame { --dk-bg: var(--dk-frame-bg); --dk-group: var(--dk-frame-group); position: relative; border: 1px solid var(--dk-frame); border-radius: 14px; overflow: hidden; background: var(--dk-bg); }
 .pg-frame .dk-root { min-height: 0; }
 .pg-embed iframe { display: block; width: 100%; height: 100%; border: 0; }
 .pg-sec { margin-top: 72px; }
-.pg-part { margin-top: 112px; padding-top: 32px; border-top: 1px solid var(--dk-border); }
-.pg-part.pg-first { margin-top: 48px; padding-top: 0; border-top: 0; }
+/* Parts are told apart by space alone (no rules): much more than between diagrams in a part. */
+.pg-part { margin-top: 144px; }
+.pg-part.pg-first { margin-top: 48px; }
 .pg-part h2 { margin: 0; font-size: 30px; line-height: 1.15; font-weight: 600; letter-spacing: -0.025em; }
 .pg-part p { margin: 10px 0 0; color: var(--dk-muted); font-size: 16px; line-height: 1.55; max-width: 680px; }
 .pg-cmd { color: var(--dk-accent); font-weight: 500; }
@@ -193,7 +194,7 @@ a { color: inherit; }
 .pg-install div { border: 1px solid var(--dk-border); border-radius: 12px; background: var(--dk-surface); padding: 14px 18px; }
 .pg-install span { font: 600 14px/1.3 var(--dk-sans); color: var(--dk-text); }
 .pg-install pre { margin: 10px 0 0; font: 400 13px/1.7 var(--dk-mono); white-space: pre-wrap; word-break: break-word; }
-.pg-foot { margin-top: 72px; padding-top: 24px; border-top: 1px solid var(--dk-border); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--dk-muted); }
+.pg-foot { margin-top: 112px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--dk-muted); }
 .pg-foot a { color: var(--dk-text); }
 @media (max-width: 640px) {
   .pg { padding: 0 16px 48px; }
@@ -202,6 +203,7 @@ a { color: inherit; }
   .pg-tagline { font-size: 15.5px; }
   .pg-btn span.pg-wide { display: none; }
   .pg-sec { margin-top: 56px; }
+  .pg-part { margin-top: 104px; }
 }`;
 
 export function pageHtml(manifest, entries, { tokens = {}, embedFonts = true } = {}) {
