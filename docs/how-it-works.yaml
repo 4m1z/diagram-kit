@@ -14,7 +14,7 @@ nodes:
   - {id: elk, label: ELK.js, link: "https://github.com/kieler/elkjs", group: engine, about: "Architecture, flowcharts, state machines, data models and trees: ELK.js places every part and routes every wire, several ways at once."}
   - {id: mind, label: Mind maps, sub: diagram-kit algorithm, group: engine, about: "Our own layout: the root in the middle, branches split left and right by size, each side a tidy tree."}
   - {id: seq, label: Sequences, sub: diagram-kit algorithm, group: engine, about: "Our own deterministic layout: columns spaced so every message label fits, rows in message order, blocks around their rows."}
-  - {id: lint, label: Programmatic layout checks, icon: list-checks, group: kit, tone: blue, about: "Code measures each layout: overlaps, crossings, wires running backwards, labels that do not fit."}
+  - {id: lint, label: Programmatic layout checks, sub: "overlaps? lines crossing?", icon: list-checks, group: kit, tone: blue, about: "Code measures each layout: overlaps, crossings, wires running backwards, labels that do not fit."}
   - {id: look, label: Agentic visual checks, icon: eye, group: kit, tone: violet, about: "Your agent looks at the rendered picture like a designer: does it read well and get the message across?"}
   - {id: out, label: Implement to any medium, icon: star, tone: amber, about: "The checked layout is the reference. Your agent rebuilds it in your medium and style: a page, an app, a doc, anything."}
 edges:

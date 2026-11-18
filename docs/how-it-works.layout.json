@@ -98,6 +98,7 @@
   {
    "id": "lint",
    "label": "Programmatic layout checks",
+   "sub": "overlaps? lines crossing?",
    "icon": "list-checks",
    "shape": "box",
    "x": 210,
@@ -107,7 +108,9 @@
    "lines": [
     "Programmatic layout checks"
    ],
-   "subLines": [],
+   "subLines": [
+    "overlaps? lines crossing?"
+   ],
    "group": "kit",
    "about": "Code measures each layout: overlaps, crossings, wires running backwards, labels that do not fit.",
    "tone": "blue"
