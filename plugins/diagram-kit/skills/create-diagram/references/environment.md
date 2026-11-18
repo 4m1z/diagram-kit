@@ -50,6 +50,8 @@ Decide this first; it changes the output, not the spec.
 title: Payments
 tagline: How a card payment moves through the system.   # optional
 repo: https://github.com/org/repo                        # optional: a prominent link
+url: https://org.github.io/repo/                         # optional: the page's public address, for link previews
+image: og.png                                            # optional: link preview image (1200x630), relative to url
 sections:
   - spec: payments-overview.yaml
     hero: true                      # first and largest, no heading
