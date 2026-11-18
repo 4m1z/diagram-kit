@@ -1,6 +1,7 @@
 # The GitHub Pages site. Rebuild: node ../plugins/diagram-kit/skills/create-diagram/scripts/diagram.mjs page site.yaml
 title: diagram-kit
 tagline: Agents are bad at placing boxes. diagram-kit gives Claude Code and Codex a layout engine (ELK.js) and a skill with the instructions and intuition to draw clear, well-positioned diagrams in whatever medium you work in.
+description: Agents are bad at placing boxes. diagram-kit gives Claude Code and Codex a layout engine for clear, well-positioned diagrams.
 repo: https://github.com/Alireza29675/diagram-kit
 url: https://alireza29675.github.io/diagram-kit/
 image: og.png

@@ -49,6 +49,7 @@ Decide this first; it changes the output, not the spec.
 ```yaml
 title: Payments
 tagline: How a card payment moves through the system.   # optional
+description: Card payments, end to end.                 # optional: for search and link previews (under 125 characters); defaults to the tagline
 repo: https://github.com/org/repo                        # optional: a prominent link
 url: https://org.github.io/repo/                         # optional: the page's public address, for link previews
 image: og.png                                            # optional: link preview image (1200x630), relative to url

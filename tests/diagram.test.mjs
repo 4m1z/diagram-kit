@@ -237,7 +237,9 @@ test('a page holds several diagrams with distinct ids and only safe links', asyn
   assert.deepEqual([...mixed.matchAll(/data-i="(\d+)"/g)].map((m) => m[1]), ['0', '1']);
   assert.throws(() => pageHtml({ sections: [] }, [{ section: { iframe: 'javascript:alert(1)' } }]), /iframe/);
   // Link previews need absolute https addresses: a relative image resolves against url, anything else is dropped.
-  const og = pageHtml({ title: 'x', url: 'https://a.dev/kit/', image: 'og.png', sections: [] }, []);
+  const og = pageHtml({ title: 'x', tagline: 'long', description: 'short', url: 'https://a.dev/kit/', image: 'og.png', sections: [] }, []);
+  assert.match(og, /name="description" content="short"/);
+  assert.match(og, /property="og:site_name" content="x"/);
   assert.match(og, /property="og:image" content="https:\/\/a\.dev\/kit\/og\.png"/);
   assert.match(og, /name="twitter:card" content="summary_large_image"/);
   assert.doesNotMatch(pageHtml({ title: 'x', url: 'javascript:alert(1)', image: 'og.png', sections: [] }, []), /og:|javascript/);

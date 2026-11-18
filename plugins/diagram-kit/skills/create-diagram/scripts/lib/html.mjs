@@ -126,16 +126,18 @@ export default function ${name.replace(/(^|[-_ ]+)(\w)/g, (_, __, c) => c.toUppe
 }
 
 // --- Several diagrams on one page: an overview plus focused views, or a gallery.
-// manifest: { title, tagline, repo, url, image, sections: [{ label, title, text, showSpec }], install: [{ label, code }], footer }
+// manifest: { title, tagline, description, repo, url, image, sections: [{ label, title, text, showSpec }], install: [{ label, code }], footer }
 // entries: [{ section, model, specText }] in section order.
 const GITHUB_MARK = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.6-4.04-1.6-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.31-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58A12 12 0 0 0 12 .3"/></svg>';
 const SUN = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
 const escPage = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 // Section text: escaped, with `backticks` shown as inline code; a leading slash command is coloured.
 const pageText = (s) => escPage(s).replace(/`([^`]+)`/g, (_, c) => `<code>${c.replace(/^(\/[\w:-]+)/, '<span class="pg-cmd">$1</span>')}</code>`);
-const previewMeta = ({ title, tagline, url, image }) => [
-  ['og:type', 'website'], ['og:title', title], ['og:description', tagline], ['og:url', url], ['og:image', image],
-].filter(([, v]) => v).map(([k, v]) => `<meta property="${k}" content="${k === 'og:title' ? v : escPage(v)}">`)
+// `title` arrives escaped; the rest is escaped here.
+const previewMeta = ({ title, description, url, image }) => [
+  ['og:type', 'website'], ['og:site_name', title], ['og:title', title], ['og:description', description && escPage(description)],
+  ['og:url', url && escPage(url)], ['og:image', image && escPage(image)],
+].filter(([, v]) => v).map(([k, v]) => `<meta property="${k}" content="${v}">`)
   .concat(`<meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">`).join('\n');
 const safeHref = (u) => (/^https?:\/\//.test(String(u ?? '')) ? escPage(u) : '#');
 // Embedded pages: a relative path inside the site, or an https URL. Nothing else.
@@ -221,6 +223,8 @@ export function pageHtml(manifest, entries, { tokens = {}, embedFonts = true } =
   let image = null;
   try { image = manifest.image ? new URL(manifest.image, url ?? undefined).href : null; } catch { image = null; }
   if (image && !/^https:\/\//.test(image)) image = null;
+  // Search results and link previews cut text at about 125 to 155 characters: `description` is the short form of the tagline.
+  const description = manifest.description ?? manifest.tagline;
   const installBlock = () =>
     `<div class="pg-install">${(manifest.install ?? []).map((b) => `<div><span>${escPage(b.label)}</span><pre>${escPage(String(b.code ?? '').trim())}</pre></div>`).join('')}</div>`;
   const placesInstall = entries.some((e) => e.section.install);
@@ -264,9 +268,9 @@ export function pageHtml(manifest, entries, { tokens = {}, embedFonts = true } =
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${title}</title>
-${manifest.tagline ? `<meta name="description" content="${escPage(manifest.tagline)}">` : ''}
+${description ? `<meta name="description" content="${escPage(description)}">` : ''}
 <meta name="generator" content="diagram-kit">
-${url || image ? previewMeta({ title, tagline: manifest.tagline, url, image }) : ''}
+${url || image ? previewMeta({ title, description, url, image }) : ''}
 <style>
 ${embedFonts ? fontFaceCss() : ''}
 ${themeCss({ light: tokens.light ?? {}, dark: tokens.dark ?? {}, fonts: tokens.fonts ?? {} })}

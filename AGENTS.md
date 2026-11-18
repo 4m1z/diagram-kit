@@ -18,7 +18,7 @@ plugins/diagram-kit/skills/create-diagram/agents/openai.yaml   Codex display met
 .claude-plugin/, .agents/plugins/                   marketplaces
 .agents/skills/create-diagram -> the skill (and .claude/skills -> .agents/skills) for dogfooding here
 examples/payments/      the showcase: brief, specs and built outputs
-docs/                   GitHub Pages: site.yaml lists the sections; `diagram.mjs page site.yaml` builds index.html; how-it-works.dark.png is the README picture; og.png is the link preview (a crop of the dark diagram, 2400x1260);
+docs/                   GitHub Pages: site.yaml lists the sections; `diagram.mjs page site.yaml` builds index.html; how-it-works.dark.png is the README picture; og.png is the link preview (a crop of the dark diagram, 1200x630);
                         3d/ is a toy racing game that adapts payments.layout.json to a drivable town (keeps rows, columns, groups and connections; its own spacing and roads; three.js r187 vendored). Preview locally over http (modules do not load from file://): `python3 -m http.server --bind 127.0.0.1 --directory docs`
 tests/                  node:test suites
 ```
