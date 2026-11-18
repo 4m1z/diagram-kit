@@ -151,12 +151,49 @@ export function mountDiagram(root, model, options = {}) {
     svg.classList.remove('dk-dim');
     for (const el of all('.is-lit, .is-current, .is-selected')) el.classList.remove('is-lit', 'is-current', 'is-selected');
   };
+  // What surrounds a lit item stays clear too: the zones it sits in (and their parents), a
+  // sequence block around a lit message, and a lit participant's lifeline and activation bars.
+  const groupById = new Map((model.groups ?? []).map((g) => [g.id, g]));
+  const lightGroupChain = (gid) => {
+    for (let g = groupById.get(gid); g; g = groupById.get(g.parent)) {
+      for (const el of all(`.dk-group[data-id="${CSS.escape(g.id)}"], .dk-group-label[data-id="${CSS.escape(g.id)}"]`)) el.classList.add('is-lit');
+    }
+  };
+  // A wire that joins a shared return line (drawn without its own arrow) lights that line too.
+  const onPath = ([px, py], pts) => pts.some(([ax, ay], i) => {
+    const [bx, by] = pts[i + 1] ?? [ax, ay];
+    return Math.min(ax, bx) - 0.5 <= px && px <= Math.max(ax, bx) + 0.5 && Math.min(ay, by) - 0.5 <= py && py <= Math.max(ay, by) + 0.5;
+  });
+  const carrierOf = (e) => (e.arrow === false && e.points?.length
+    ? model.edges.find((o) => o !== e && o.to === e.to && o.arrow !== false && o.points?.length && onPath(e.points.at(-1), o.points))
+    : null);
+  const lightAround = (nodeIds, edges = []) => {
+    for (const e of edges) { const c = carrierOf(e); if (c) edgeEls(c.id).forEach((el) => el.classList.add('is-lit')); }
+    for (const id of nodeIds) {
+      const n = model.nodes.find((x) => x.id === id);
+      if (n?.group) lightGroupChain(n.group);
+      // A wire can end on a group; one drawn as a part (it has an icon) lights with its parts.
+      const g = groupById.get(id);
+      if (g) {
+        lightGroupChain(id);
+        if (g.icon) for (const m of model.nodes) if (m.group === id) nodeEl(m.id)?.classList.add('is-lit');
+      }
+      svg.querySelector(`.dk-lifeline[data-id="${CSS.escape(id)}"]`)?.classList.add('is-lit');
+      for (const b of all(`.dk-bar[data-owner="${CSS.escape(id)}"]`)) b.classList.add('is-lit');
+    }
+    for (const e of edges) {
+      for (const g of model.groups ?? []) {
+        if (g.variant !== 'fragment' || !e.points?.length) continue;
+        if (e.points.every(([x, y]) => x >= g.x && x <= g.x + g.w && y >= g.y && y <= g.y + g.h)) lightGroupChain(g.id);
+      }
+    }
+  };
   const lightNode = (id) => {
     const lit = new Set([id]);
-    for (const e of model.edges) if (e.from === id || e.to === id) { lit.add(e.from); lit.add(e.to); edgeEls(e.id).forEach((el) => el.classList.add('is-lit')); }
+    const edges = [];
+    for (const e of model.edges) if (e.from === id || e.to === id) { lit.add(e.from); lit.add(e.to); edges.push(e); edgeEls(e.id).forEach((el) => el.classList.add('is-lit')); }
     for (const n of lit) nodeEl(n)?.classList.add('is-lit');
-    for (const b of all(`.dk-bar[data-owner="${CSS.escape(id)}"]`)) b.classList.add('is-lit');
-    svg.querySelector(`.dk-lifeline[data-id="${CSS.escape(id)}"]`)?.classList.add('is-lit');
+    lightAround(lit, edges);
     svg.classList.add('dk-dim');
   };
   const groupMembers = (id) => {
@@ -172,8 +209,7 @@ export function mountDiagram(root, model, options = {}) {
     const inside = groupMembers(id);
     for (const n of inside) nodeEl(n)?.classList.add('is-lit');
     for (const e of model.edges) if (inside.has(e.from) && inside.has(e.to)) edgeEls(e.id).forEach((el) => el.classList.add('is-lit'));
-    svg.querySelector(`.dk-group-label[data-id="${CSS.escape(id)}"]`)?.classList.add('is-lit');
-    svg.querySelector(`.dk-group[data-id="${CSS.escape(id)}"]`)?.classList.add('is-lit');
+    lightGroupChain(id);
     svg.classList.add('dk-dim');
   };
   const lightEdge = (id) => {
@@ -182,6 +218,7 @@ export function mountDiagram(root, model, options = {}) {
     edgeEls(id).forEach((el) => el.classList.add('is-lit'));
     nodeEl(e.from)?.classList.add('is-lit');
     nodeEl(e.to)?.classList.add('is-lit');
+    lightAround([e.from, e.to], [e]);
     svg.classList.add('dk-dim');
   };
 
@@ -263,6 +300,7 @@ export function mountDiagram(root, model, options = {}) {
       edgeEls(e.id).forEach((el) => el.classList.add(k === step ? 'is-current' : 'is-lit', 'is-lit'));
       nodeEl(e.from)?.classList.add('is-lit');
       nodeEl(e.to)?.classList.add('is-lit');
+      lightAround([e.from, e.to], [e]);
     });
     for (const b of all(`.dk-badge[data-flow="${CSS.escape(f.id)}"]`)) b.classList.toggle('is-current', Number(b.dataset.step) === step + 1);
     stepLabel();

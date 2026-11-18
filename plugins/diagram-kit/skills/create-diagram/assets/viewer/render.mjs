@@ -192,6 +192,13 @@ function nodeSvg(model, n, p) {
   return `<g class="dk-node" data-id="${esc(n.id)}" data-shape="${esc(n.shape ?? 'box')}">${parts.join('')}</g>`;
 }
 
+// A gradient stop in a theme colour (vars mode puts it in style so var() works).
+function stopSvg(p, name, offset, opacity) {
+  return p.mode === 'vars'
+    ? `<stop offset="${offset}" style="stop-color:${p.color(name)};stop-opacity:${opacity}"/>`
+    : `<stop offset="${offset}" stop-color="${esc(p.color(name))}" stop-opacity="${opacity}"/>`;
+}
+
 // A part with a link gets a very small arrow in its top-right corner that opens the link in a new
 // tab (the viewer lets clicks on links through instead of selecting the part).
 export const LINK_ICON = 'arrow-up-right';
@@ -222,6 +229,7 @@ function groupSvg(g, p) {
   if (g.icon) {
     return `<g class="dk-group dk-container" data-id="${esc(g.id)}">` +
       `<rect x="${n1(g.x)}" y="${n1(g.y)}" width="${n1(g.w)}" height="${n1(g.h)}" rx="${S.radius}" ${p.attrs({ fill: 'surface', stroke: g.tone === 'accent' ? 'accent' : 'border', sw: S.stroke })} filter="${p.ref('shadow')}"/>` +
+      `<rect x="${n1(g.x)}" y="${n1(g.y)}" width="${n1(g.w)}" height="${n1(g.h)}" rx="${S.radius}" fill="${p.ref('container')}"/>` +
       `</g>`;
   }
   return `<g class="dk-group" data-id="${esc(g.id)}">` +
@@ -286,7 +294,8 @@ export function renderSvg(model, opts = {}) {
   o.push(`<svg xmlns="http://www.w3.org/2000/svg" class="dk-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`);
   const shadowColor = p.mode === 'vars' ? 'var(--dk-shadow)' : p.tokens.shadow;
   o.push(`<defs><filter id="${p.idPrefix}-shadow" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="${shadowColor}"/></filter>` +
-    `<pattern id="${p.idPrefix}-dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" ${p.attrs({ fill: 'dot' })}/></pattern></defs>`);
+    `<pattern id="${p.idPrefix}-dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" ${p.attrs({ fill: 'dot' })}/></pattern>` +
+    `<linearGradient id="${p.idPrefix}-container" x1="0" y1="0" x2="1" y2="1">${stopSvg(p, 'containerTint', 0, 1)}${stopSvg(p, 'containerTint', 1, 0.15)}</linearGradient></defs>`);
   if (opts.background) {
     o.push(`<rect width="${W}" height="${H}" ${p.attrs({ fill: 'bg' })}/>`);
     o.push(`<rect width="${W}" height="${H}" fill="${p.ref('dots')}"/>`);
@@ -300,8 +309,15 @@ export function renderSvg(model, opts = {}) {
   const byDepth = (a, b) => (a.depth ?? 0) - (b.depth ?? 0);
   const groups = model.groups ?? [];
   for (const g of groups.filter((x) => x.variant !== 'fragment').sort(byDepth)) o.push(groupSvg(g, p));
+  // A block's tint goes under the lifelines and bars, like a zone; its frame and label go on top.
+  // Outermost blocks are grey like zones; each level inside gets its own faint colour.
+  for (const g of groups.filter((x) => x.variant === 'fragment').sort(byDepth)) {
+    const d = g.depth ?? 0;
+    const fill = d ? `blockTint${((d - 1) % 3) + 1}` : 'group';
+    o.push(`<rect x="${n1(g.x)}" y="${n1(g.y)}" width="${n1(g.w)}" height="${n1(g.h)}" rx="8" class="dk-group dk-fragment dk-fragment-fill" data-id="${esc(g.id)}" ${p.attrs({ fill })}/>`);
+  }
   for (const l of (model.lines ?? []).filter((x) => x.kind !== 'divider')) {
-    o.push(`<path d="M${n1(l.x1)},${n1(l.y1)} L${n1(l.x2)},${n1(l.y2)}" class="dk-lifeline" data-id="${esc(l.id ?? '')}" ${p.attrs({ fill: 'none', stroke: 'border', sw: 1, dash: '3 4' })}/>`);
+    o.push(`<path d="M${n1(l.x1)},${n1(l.y1)} L${n1(l.x2)},${n1(l.y2)}" class="dk-lifeline" data-id="${esc(l.id ?? '')}" ${p.attrs({ fill: 'none', stroke: 'lifeline', sw: 1.25, dash: '4 4' })}/>`);
   }
   for (const b of model.bars ?? []) {
     o.push(`<rect x="${n1(b.x)}" y="${n1(b.y)}" width="${n1(b.w)}" height="${n1(b.h)}" rx="2" class="dk-bar" data-owner="${esc(b.owner ?? '')}" ${p.attrs({ fill: 'surface', stroke: 'borderStrong', sw: 1 })}/>`);
